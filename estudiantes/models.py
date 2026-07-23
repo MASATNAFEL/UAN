@@ -12,8 +12,8 @@ class Estudiante(models.Model):
 	fecha_registro = models.DateTimeField(auto_now_add=True)
 	fecha_actualizacion = models.DateTimeField(auto_now=True)
 
-	def __str__(self):
-    		return f"{self.cedula_ciudadania}"
+	def str(self):
+    		return f"{self.nombre} - {self.cedula_ciudadania}"
 
 class Carpeta(models.Model):
 	codcarpeta=models.IntegerField(default=0,primary_key=True)
@@ -27,5 +27,5 @@ class Carpeta(models.Model):
 	observa = models.TextField(blank=True, null=True)
 
 	def str(self):
-    		return __str__(self.codcarpeta)
+    		return str(self.codcarpeta)
 	

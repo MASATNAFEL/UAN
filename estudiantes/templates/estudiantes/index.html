@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<HTML lang="es">
+<html lang="en">
 <head>
-	<meta charset="UFT-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Prueba</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
-<body>
-	{% if lista_estudiantes %}
-		<ul>
-		{% for estudiante in lista_estudiantes %}
-			<li><a href="{% url 'estudiantes:detalles' estudiante.cedula_ciudadania %}">{{estudiante.nombre}}</a></li>
-		{% endfor %}
-		</ul>
-	{%else%}
-		<p>sin estudiantes.</p>
-	{%endif%}
-
+<body> 
+    {%if lista_Estudiantes%}
+    <ul>
+    {% for estudiante in lista_Estudiantes %}
+        <li><a href="/estudiantes/{{ estudiante.cedula_ciudadania }}/">{{ estudiante.nombre }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>no hay estudiantes.</p>
+{% endif %}
+<br><br>
+<a href="{% url 'buscar' %}">Ir al Buscar estudiantes</a>
 </body>
 </html>

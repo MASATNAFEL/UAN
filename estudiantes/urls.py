@@ -1,9 +1,9 @@
 from django.urls import path
 from . import views
 
-app_name= "estudiantes"
+
 urlpatterns = [
     path("", views.index, name="index"),
-    path("<cedula>/", views.detalles, name="detalles"),
-
+    path("info/<str:cedula_ciudadania>/", views.informacion, name="informacion"),
+    path("buscar/", views.buscar, name="buscar"),
 ]
