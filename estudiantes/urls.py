@@ -6,4 +6,5 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("info/<str:cedula_ciudadania>/", views.informacion, name="informacion"),
     path("buscar/", views.buscar, name="buscar"),
+    path("registro/", views.addestudiante, name="registro"),
 ]

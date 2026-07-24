@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,9 +22,27 @@
 <h3>Resultados:</h3>
     
     {% if resultado %}
-        <ul>
+        <table border="1">
+    <thead>
+      <tr>
+        <th colspan="5">Resultados de la busqueda</th>
+      </tr>
+	<tr>
+        	<th>Nombre</th>
+        	<th>tipo doc.</th>
+        	<th>cédula</th>
+        	<th>Programa</th>
+        	<th>contacto</th>
+      </tr>
+    </thead>
+    <tbody>
             {% for item in resultado %}
-                <li><strong>{{ item.nombre }}</strong> - {{ item.cedula_ciudadania }}</li>
+           <tr>
+	        <td><strong>{{ item.nombre }}</strong></td>
+		<td>{{ item.tipocc }}</td>
+ 		<td>{{ item.cedula_ciudadania }}</td>
+		<td>{{ item.programa }}</td>
+		<td>{{ item.contacto }}</td>
             {% endfor %}
         </ul>
     {% else %}

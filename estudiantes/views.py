@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from .models import Estudiante
+from .forms import FormularioEstudiante
 from django.db.models import Q
-from django.shortcuts import get_object_or_404,render
+from django.shortcuts import get_object_or_404,render,redirect
 
 def index(request):
     lista_Estudiantes = Estudiante.objects.all()
@@ -25,3 +26,13 @@ def buscar(request):
 
     context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"resultado":resultado}
     return render(request,"estudiantes/buscar.html",context)
+
+def addestudiante(request):
+    if request.method=="POST":
+        form= FormularioEstudiante(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("index")
+    else:
+        form=FormularioEstudiante()
+    return render(request,"estudiantes/registro.html",{"form":form})
