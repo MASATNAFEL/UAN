@@ -1,0 +1,238 @@
+/* estudiantes/static/estudiantes/css/styles.css */
+
+/* ==========================================================================
+   1. ESTRUCTURA Y TARJETAS (Profile, Search, Form)
+   ========================================================================== */
+.profile-card,
+.search-card,
+.form-card {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.profile-header,
+.search-header,
+.form-header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+
+.profile-header h2,
+.search-header h2,
+.form-header h2 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.profile-body,
+.search-body,
+.form-body {
+    padding: 2rem;
+}
+
+/* ==========================================================================
+   2. GRILLAS DE INFORMACIÓN Y FILTROS
+   ========================================================================== */
+.info-grid,
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 576px) {
+    .info-grid,
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.info-item {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #38bdf8;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label,
+.form-group label,
+.form-container label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.05em;
+}
+
+.info-value {
+    font-size: 1.05rem;
+    color: #0f172a;
+    font-weight: 500;
+    word-break: break-word;
+}
+
+/* ==========================================================================
+   3. ENTRADAS DE FORMULARIO (Inputs, Selects, Textareas)
+   ========================================================================== */
+.form-control-custom,
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="number"],
+.form-container input[type="date"],
+.form-container select,
+.form-container textarea {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+.form-control-custom:focus,
+.form-container input:focus,
+.form-container select:focus,
+.form-container textarea:focus {
+    border-color: #38bdf8;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+.form-container p {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+}
+
+/* ==========================================================================
+   4. BOTONES Y BARRA DE ACCIONES
+   ========================================================================== */
+.actions-container,
+.filter-actions,
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary { background-color: #0284c7; color: #ffffff; }
+.btn-primary:hover { background-color: #0369a1; }
+
+.btn-success { background-color: #10b981; color: #ffffff; }
+.btn-success:hover { background-color: #059669; }
+
+.btn-warning { background-color: #eab308; color: #1e293b; }
+.btn-warning:hover { background-color: #ca8a04; }
+
+.btn-danger { background-color: #ef4444; color: #ffffff; }
+.btn-danger:hover { background-color: #dc2626; }
+
+.btn-secondary { background-color: #64748b; color: #ffffff; }
+.btn-secondary:hover { background-color: #475569; }
+
+.btn-info { background-color: #38bdf8; color: #0f172a; font-size: 0.85rem; padding: 0.4rem 0.8rem; }
+.btn-info:hover { background-color: #0ea5e9; color: #ffffff; }
+
+/* ==========================================================================
+   5. TABLAS DE RESULTADOS
+   ========================================================================== */
+.table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.custom-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.custom-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    color: #0f172a;
+}
+
+.custom-table tbody tr:hover { background-color: #f1f5f9; }
+
+/* ==========================================================================
+   6. MODAL DE CONFIRMACIÓN (Eliminar) Y MENSAJES
+   ========================================================================== */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    overflow: hidden;
+}
+
+.modal-header-danger {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+#icono {
+            width: 8vw;
+            height: 10vh;
+            margin-right: 8px;
+        }
+#index {
+    height: 100%;        
+    width: auto;
+        }
+
+    .form-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-top: 0.25rem;
+}
+
+.errorlist { list-style: none; padding: 0; margin: 0.3rem 0 0 0; color: #ef4444; font-size: 0.85rem; }
+.helptext { font-size: 0.8rem; color: #94a3b8; }
+.no-results { text-align: center; padding: 2rem; color: #64748b; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; }

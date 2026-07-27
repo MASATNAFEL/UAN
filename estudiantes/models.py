@@ -11,9 +11,22 @@ class Estudiante(models.Model):
 	email=models.EmailField(blank=True, null=True)
 	fecha_registro = models.DateTimeField(auto_now_add=True)
 	fecha_actualizacion = models.DateTimeField(auto_now=True)
-
+	activo = models.BooleanField(default=True)
 	def str(self):
     		return f"{self.nombre} - {self.cedula_ciudadania}"
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+	def get_fields(self):
+			ocultar=["fecha_registro", "fecha_actualizacion", "activo"]
+			return [
+            {
+				'name': field.name,
+                'verbose_name': field.verbose_name.title(), 
+                'value': getattr(self, field.name)
+            }
+			for field in self._meta.fields
+            if field.name not in ocultar
+    		]
 
 class Carpeta(models.Model):
 	codcarpeta=models.IntegerField(default=0,primary_key=True)

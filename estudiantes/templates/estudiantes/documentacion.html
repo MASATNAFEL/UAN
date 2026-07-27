@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body> 
+    <div class="header-banner">
+    <h1>DOCUMENTACIÓN TÉCNICA Y ARQUITECTURA</h1>
+    <p>Sistema de Gestión de Información de Estudiantes Inactivos</p>
+    <div class="meta-table">
+        <div class="meta-cell"><strong>Institución:</strong> Universidad Antonio Nariño</div>
+        <div class="meta-cell"><strong>Sede:</strong> Pereira, Risaralda</div>
+        <div class="meta-cell"><strong>Framework:</strong> Django 5.0+ / Python 3.11+</div>
+    </div>
+</div>
+
+<h2>1. Resumen Ejecutivo y Propósito</h2>
+<div class="card">
+    <p>
+        El presente documento define los lineamientos estandarizados de desarrollo, arquitectura de software, modelo de datos y guía de despliegue para el <strong>Sistema de Gestión de Información de Estudiantes Inactivos</strong> de la <strong>Universidad Antonio Nariño (UAN) Sede Pereira</strong>.
+    </p>
+    <p>
+        El sistema soluciona la dispersión documental y facilita la trazabilidad de los estudiantes que interrumpieron su proceso formativo, ofreciendo una herramienta web centralizada, segura y escalable para la toma de decisiones directivas y el seguimiento de retención estudiantil.
+    </p>
+</div>
+
+<h2>2. Arquitectura del Sistema</h2>
+<p>
+    La aplicación está construida bajo el patrón arquitectónico <strong>MVT (Model-View-Template)</strong> nativo de Django, priorizando la separación de responsabilidades y la seguridad de los datos.
+</p>
+
+<div class="layout-table">
+    <div class="layout-cell">
+        <div class="card">
+            <h3>Capa de Presentación (Templates & Static)</h3>
+            <ul>
+                <li>Interfaz adaptativa (Responsive) optimizada para navegadores modernos.</li>
+                <li>Uso de componentes modulables y plantillas base heredables.</li>
+                <li>Protección explícita contra vulnerabilidades XSS y CSRF.</li>
+            </ul>
+        </div>
+    </div>
+    <div class="layout-cell">
+        <div class="card">
+            <h3>Capa de Negocio y Datos (Views & Models)</h3>
+            <ul>
+                <li>Vistas basadas en clases (CBV) y funciones optimizadas.</li>
+                <li>ORM de Django para consultas eficientes y seguras.</li>
+                <li>Transiciones de estado controladas para expedientes de estudiantes.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<h2>3. Componentes Principales y Estructura del Proyecto</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Módulo / Directori o</th>
+            <th>Propósito Principal</th>
+            <th>Estado / Componentes clave</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>.venv/</code></td>
+            <td>Entorno virtual aislado con librerías del proyecto.</td>
+            <td><span class="badge badge-warning">Excluido en Git</span></td>
+        </tr>
+        <tr>
+            <td><code>uan_project/</code></td>
+            <td>Núcleo de configuración (settings, urls, wsgi, asgi).</td>
+            <td><span class="badge badge-success">Configurado</span></td>
+        </tr>
+        <tr>
+            <td><code>estudiantes/</code></td>
+            <td>Aplicación principal: modelos, vistas, formularios de estudiantes.</td>
+            <td><span class="badge badge-success">En Desarrollo</span></td>
+        </tr>
+        <tr>
+            <td><code>templates/</code></td>
+            <td>Vistas HTML, formularios de captura y dashboards de reportes.</td>
+            <td><span class="badge badge-success">Implementado</span></td>
+        </tr>
+        <tr>
+            <td><code>static/ & media/</code></td>
+            <td>Recursos estáticos (CSS/JS) y expedientes adjuntos en PDF/Imágenes.</td>
+            <td><span class="badge badge-success">Estructurado</span></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>4. Guía Estándar de Configuración y Despliegue</h2>
+<h3>4.1. Comandos de Inicialización Local</h3>
+<div class="code-block"></div>
+</body>
+</html>

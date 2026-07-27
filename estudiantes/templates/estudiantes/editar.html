@@ -1,0 +1,45 @@
+{% extends 'estudiantes/index1.html' %}
+
+{% block title %}Actualizar Información - SGEIUAN{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+    <div class="form-header">
+        <h2>Actualizar Información</h2>
+    </div>
+
+    <div class="form-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <!-- Renderizado automático y elegante de cada campo del formulario -->
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    
+                    {% if field.help_text %}
+                        <small class="form-help">{{ field.help_text }}</small>
+                    {% endif %}
+                    
+                    {% for error in field.errors %}
+                        <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="actions-container">
+                <!-- Mantiene tu ruta dinámica original para cancelar -->
+                <a href="{% url 'informacion' estudiante.pk %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+                
+                <button type="submit" class="btn btn-success">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,53 +1,243 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form action="" method="GET">
-<div>
-<label for="n">Nombre:</label>
-<input type="text" name="n" id="n" placeholder="Buscar Nombre..." value="{{ consulta_nombre}}">
+{% extends 'estudiantes/index1.html' %}
+
+{% block title %}Búsqueda de Estudiantes{% endblock %}
+
+{% block content %}
+<style>
+    .search-card {
+        max-width: 900px;
+        margin: 2rem auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+
+    .search-header {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: #ffffff;
+        padding: 1.5rem 2rem;
+        text-align: center;
+    }
+
+    .search-header h2 {
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .search-body {
+        padding: 2rem;
+    }
+
+    /* Formulario de filtros en grilla */
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 576px) {
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 0.4rem;
+        letter-spacing: 0.05em;
+    }
+
+    .form-control-custom {
+        padding: 0.65rem 0.9rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .form-control-custom:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    .filter-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Botones alineados a la línea gráfica */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #0284c7;
+        color: #ffffff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0369a1;
+    }
+
+    .btn-secondary {
+        background-color: #64748b;
+        color: #ffffff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #475569;
+    }
+
+    .btn-info {
+        background-color: #38bdf8;
+        color: #0f172a;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-info:hover {
+        background-color: #0ea5e9;
+        color: #ffffff;
+    }
+
+    /* Estilos de la tabla de resultados */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.95rem;
+    }
+
+    .custom-table th {
+        background-color: #f8fafc;
+        color: #475569;
+        font-weight: 700;
+        padding: 0.85rem 1rem;
+        border-bottom: 2px solid #e2e8f0;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .custom-table td {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        color: #0f172a;
+    }
+
+    .custom-table tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px dashed #cbd5e1;
+    }
+</style>
+
+<div class="search-card">
+    <div class="search-header">
+        <h2 id="listado-title">Consulta y Filtro de Estudiantes</h2>
+    </div>
+
+    <div class="search-body">
+        <!-- Formulario de Búsqueda -->
+        <form action="" method="GET">
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="n">Nombre:</label>
+                    <input type="text" name="n" id="n" class="form-control-custom" placeholder="Buscar por nombre..." value="{{ consulta_nombre }}">
+                </div>
+                <div class="form-group">
+                    <label for="c">Cédula:</label>
+                    <input type="text" name="c" id="c" class="form-control-custom" placeholder="Buscar por documento..." value="{{ consulta_cedula }}">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <a href="{% url 'buscar' %}" class="btn btn-secondary">Limpiar Filtros</a>
+                <button type="submit" class="btn btn-primary">🔍 Buscar</button>
+            </div>
+        </form>
+
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+
+        <!-- Resultados -->
+        <h3 style="font-size: 1.2rem; color: #1e293b; margin-bottom: 1rem; font-weight: 600;">Resultados de la Búsqueda</h3>
+        
+        {% if resultado %}
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Tipo Doc.</th>
+                            <th>Cédula</th>
+                            <th>Programa</th>
+                            <th>Contacto</th>
+                            <th>Cód. Carpeta</th>
+                            <th style="text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in resultado %}
+                            <tr>
+                                <td><strong>{{ item.nombre }}</strong></td>
+                                <td>{{ item.tipocc }}</td>
+                                <td>{{ item.cedula_ciudadania }}</td>
+                                <td>{{ item.programa }}</td>
+                                <td>{{ item.contacto|default:"No registrado" }}</td>
+                                <td>{{ item.codcarpeta|default:"N/A" }}</td>
+                                <td style="text-align: center;">
+                                    <a href="{% url 'informacion' item.cedula_ciudadania %}" class="btn btn-info">
+                                        Ver Expediente
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-results">
+                <p style="margin: 0;">No se encontraron registros que coincidan con los criterios ingresados.</p>
+            </div>
+        {% endif %}
+    </div>
 </div>
-<div>
-<label for="c">Cedula:</label>
-<input type="text" name="c" id="c" placeholder="Buscar Cedula..." value="{{ consulta_cedula}}">
-</div>
-        <button type="submit">Buscar</button>
-<a href="{% url 'buscar' %}">Limpiar filtros</a>
-    </form>
-<hr>
-<h3>Resultados:</h3>
-    
-    {% if resultado %}
-        <table border="1">
-    <thead>
-      <tr>
-        <th colspan="5">Resultados de la busqueda</th>
-      </tr>
-	<tr>
-        	<th>Nombre</th>
-        	<th>tipo doc.</th>
-        	<th>cédula</th>
-        	<th>Programa</th>
-        	<th>contacto</th>
-      </tr>
-    </thead>
-    <tbody>
-            {% for item in resultado %}
-           <tr>
-	        <td><strong>{{ item.nombre }}</strong></td>
-		<td>{{ item.tipocc }}</td>
- 		<td>{{ item.cedula_ciudadania }}</td>
-		<td>{{ item.programa }}</td>
-		<td>{{ item.contacto }}</td>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No se encontraron resultados con los criterios ingresados.</p>
-    {% endif %}
-    
-</body>
-</html>
+{% endblock %}

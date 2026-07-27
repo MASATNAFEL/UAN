@@ -1,15 +1,30 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body> 
-	<form method="POST">
-	     {% csrf_token %}
-             {{ form.as_p}}
-             <button type="submit">Guardar</button>
-	</form>
-</body>
-</html>
+HTML
+{% extends 'estudiantes/index1.html' %}
+
+{% block title %}Formulario de Estudiante{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="form-header">
+        <h2 id="listado-title">Gestión de Expediente</h2>
+    </div>
+
+    <div class="form-body">
+        <form method="POST" class="form-container">
+            {% csrf_token %}
+
+            <!-- Renderiza los campos que tenga tu modelo de forma automática -->
+            {{ form.as_p }}
+
+            <div class="form-actions">
+                <a href="{% url 'index' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-success">
+                    💾 Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
