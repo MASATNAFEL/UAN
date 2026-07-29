@@ -4,138 +4,6 @@ HTML
 {% block title %}Expediente Completo - {{ estudiante.nombre }}{% endblock %}
 
 {% block content %}
-<style>
-    .profile-card {
-        max-width: 750px;
-        margin: 2rem auto;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        border: 1px solid #e2e8f0;
-    }
-
-    .profile-header {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        color: #ffffff;
-        padding: 2rem;
-        text-align: center;
-    }
-
-    .profile-header h2 {
-        font-size: 1.8rem;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .profile-body {
-        padding: 2rem;
-    }
-
-    /* Grilla automática que acomoda los campos limpiamente */
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.25rem;
-        margin-bottom: 2rem;
-    }
-
-    @media (max-width: 576px) {
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .info-item {
-        background: #f8fafc;
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 4px solid #38bdf8;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .info-label {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #64748b;
-        margin-bottom: 0.3rem;
-        font-weight: 700;
-    }
-
-    .info-value {
-        font-size: 1.05rem;
-        color: #0f172a;
-        font-weight: 500;
-        word-break: break-word; /* Evita que textos largos rompan el diseño */
-    }
-
-    .actions-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 0.75rem;
-        border-top: 1px solid #e2e8f0;
-        padding-top: 1.5rem;
-        flex-wrap: wrap;
-    }
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.75rem 1.25rem;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s;
-        border: none;
-        cursor: pointer;
-        flex: 1;
-        min-width: 140px;
-    }
-
-    .btn-warning {
-        background-color: #eab308;
-        color: #1e293b;
-    }
-
-    .btn-warning:hover {
-        background-color: #ca8a04;
-    }
-
-    .btn-secondary {
-        background-color: #64748b;
-        color: #ffffff;
-    }
-
-    .btn-secondary:hover {
-        background-color: #475569;
-    }
-
-    .btn-danger {
-        background-color: #ef4444;
-        color: #ffffff;
-    }
-
-    .btn-danger:hover {
-        background-color: #dc2626;
-    }
-
-    /* Modal emergente nativo/Bootstrap */
-    .modal-content {
-        border-radius: 12px;
-        border: none;
-        overflow: hidden;
-    }
-
-    .modal-header-danger {
-        background-color: #ef4444;
-        color: white;
-    }
-</style>
 
 <div class="profile-card">
     <div class="profile-header">
@@ -149,7 +17,11 @@ HTML
                 <div class="info-item">
                     <div class="info-label">{{ campo.verbose_name }}</div>
                     <div class="info-value">
-                        {% if campo.value != None %}
+                        {% if campo.value is True %}
+                            <span style="color: #10b981; font-weight: 600;">Sí</span>
+                        {% elif campo.value is False %}
+                            <span style="color: #ef4444; font-weight: 600;">No</span>
+                        {% elif campo.value != None %}
                             {{ campo.value }}
                         {% else %}
                             <em style="color: #94a3b8;">No registrado</em>

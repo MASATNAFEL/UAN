@@ -91,6 +91,7 @@
 .form-container input[type="email"],
 .form-container input[type="number"],
 .form-container input[type="date"],
+.form-container input:not([type="checkbox"]),
 .form-container select,
 .form-container textarea {
     width: 100%;
@@ -119,7 +120,13 @@
     flex-direction: column;
     margin-bottom: 1.25rem;
 }
-
+.form-container input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    margin-top: 0.4rem;
+    accent-color: #0284c7; /* Color cuando está marcado */
+}
 /* ==========================================================================
    4. BOTONES Y BARRA DE ACCIONES
    ========================================================================== */
