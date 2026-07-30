@@ -32,6 +32,16 @@
       </tr>
     </tbody>
   </table> 
-  
+  <div class="d-flex justify-content-between">
+    <a href="{%url 'editar' estudiante.cedula_ciudadania %}" class="btn btn-warning">Actualizar datos</a></div>
+    <form method="post" action="{% url 'borrar' estudiante.cedula_ciudadania%}" onsubmit="return confirmarEliminacion('{{estudiante.cedula_ciudadania}}')">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-warning">Borrar</button>
+    </form>
 </body>
+<script>
+  function confirmarEliminacion(cedula){
+    return confirm("¿Estás seguro que deseas eliminar este registro con la cédula?"+cedula+"")
+  }
+</script>
 </html>

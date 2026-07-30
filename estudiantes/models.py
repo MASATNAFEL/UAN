@@ -11,6 +11,7 @@ class Estudiante(models.Model):
 	email=models.EmailField(blank=True, null=True)
 	fecha_registro = models.DateTimeField(auto_now_add=True)
 	fecha_actualizacion = models.DateTimeField(auto_now=True)
+	activo = models.BooleanField(default=True)
 
 	def str(self):
     		return f"{self.nombre} - {self.cedula_ciudadania}"
