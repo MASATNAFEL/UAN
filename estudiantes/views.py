@@ -42,12 +42,12 @@ def buscar(request):
 
 def addestudiante(request):
     if request.method=="POST":
-        form = FormularioEstudiante(request.POST, instance=Estudiante)
+        form = FormularioEstudiante(request.POST)
         if form.is_valid():
             form.save()
             return redirect('informacion', Estudiante.cedula_ciudadania)
     else:
-        form=FormularioEstudiante(instance=Estudiante)
+        form=FormularioEstudiante()
     return render(request,"estudiantes/registro.html",{"form":form})
 
 def borrar(request, cedula_ciudadania):
