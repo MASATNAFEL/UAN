@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>informacion carpeta</title>
+</head>
+<body>
+  <h1>informacion carpeta</h1> 
+  <table border="1">
+    <thead>
+      <tr>
+        <th colspan="2">{{carpeta.codcarpeta}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>año de inicio:</td>
+        <td>{{ carpeta.year_start }}</td>
+      </tr>
+      <tr>
+        <td>año de finalización:</td>
+        <td>{{ carpeta.year_end }}</td>
+      </tr>
+       <tr>
+        <td>registro de notas</td>
+        <td>{{ carpeta.notas }}</td>
+      </tr>
+       <tr>
+      
+      </tr>
+    </tbody>
+  </table> 
+  <div class="d-flex justify-content-between">
+  
+    <form method="post" action="{% url 'borrar' carpeta.cedula_ciudadania%}" onsubmit="return confirmarEliminacion('{{carpeta.cedula_ciudadania}}')">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-warning">Borrar</button>
+    </form>
+</body>
+<script>
+  function confirmarEliminacion(cedula){
+    return confirm("¿Estás seguro que deseas eliminar este registro con la cédula?"+cedula+"")
+  }
+</script>
+</html>

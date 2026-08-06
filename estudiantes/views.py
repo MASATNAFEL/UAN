@@ -1,6 +1,6 @@
 from django.http import HttpResponse
-from .models import Estudiante
-from .forms import FormularioEstudiante
+from .models import Estudiante,Carpeta
+from .forms import FormularioEstudiante, FormularioCarpeta
 from django.db.models import Q
 from django.shortcuts import get_object_or_404,render,redirect
 
@@ -12,6 +12,9 @@ def index(request):
 def informacion(request,cedula_ciudadania):
     estudiante=get_object_or_404(Estudiante,pk=cedula_ciudadania)
     return render(request,"estudiantes/informacion.html", {"estudiante":estudiante})
+def informacion1(request,codcarpeta):
+    carpeta=get_object_or_404(Carpeta,pk=codcarpeta)
+    return render(request,"estudiantes/informacion.html", {"carpeta":carpeta})
 
 def editar(request,cedula_ciudadania):
     print(request.method)
@@ -49,10 +52,25 @@ def addestudiante(request):
     else:
         form=FormularioEstudiante()
     return render(request,"estudiantes/registro.html",{"form":form})
+def addcarpeta(request):
+    if request.method=="POST":
+        form = FormularioCarpeta(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('informacion2',Carpeta.codcarpeta)
+    else:
+        form=FormularioCarpeta()
+    return render(request,"estudiantes/registro.html",{"form":form})
 
 def borrar(request, cedula_ciudadania):
     if request.method=="POST":
         estudiante=get_object_or_404(Estudiante,pk=cedula_ciudadania)
         estudiante.activo=False
         estudiante.save()
+        return redirect("index")
+def borrar1(request, codcarpeta):
+    if request.method=="POST":
+        carpeta=get_object_or_404(Carpeta,pk=codcarpeta)
+        carpeta.activo=False
+        carpeta.save()
         return redirect("index")
