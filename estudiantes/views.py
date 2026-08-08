@@ -14,7 +14,7 @@ def informacion(request,cedula_ciudadania):
     return render(request,"estudiantes/informacion.html", {"estudiante":estudiante})
 def informacion1(request,codcarpeta):
     carpeta=get_object_or_404(Carpeta,pk=codcarpeta)
-    return render(request,"estudiantes/informacion.html", {"carpeta":carpeta})
+    return render(request,"estudiantes/informacion2.html", {"carpeta":carpeta})
 
 def editar(request,cedula_ciudadania):
     print(request.method)
@@ -48,7 +48,7 @@ def addestudiante(request):
         form = FormularioEstudiante(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('informacion', Estudiante.cedula_ciudadania)
+            return redirect('index')
     else:
         form=FormularioEstudiante()
     return render(request,"estudiantes/registro.html",{"form":form})
@@ -57,7 +57,7 @@ def addcarpeta(request):
         form = FormularioCarpeta(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('informacion2',Carpeta.codcarpeta)
+            return redirect('index')
     else:
         form=FormularioCarpeta()
     return render(request,"estudiantes/registro.html",{"form":form})

@@ -30,10 +30,15 @@
         <td>Contacto:</td>
         <td>{{ estudiante.contacto }}</td>
       </tr>
+      <tr>
+        <td>Carpeta:</td>
+        <td><a href="{%url 'carpeta' %}" class="btn btn-warning">Crear carpeta</a></div></td>
+      </tr>
     </tbody>
   </table> 
   <div class="d-flex justify-content-between">
     <a href="{%url 'editar' estudiante.cedula_ciudadania %}" class="btn btn-warning">Actualizar datos</a></div>
+    <a href="{%url 'index' %}" class="btn btn-warning">Regresar a inicio</a></div>
     <form method="post" action="{% url 'borrar' estudiante.cedula_ciudadania%}" onsubmit="return confirmarEliminacion('{{estudiante.cedula_ciudadania}}')">
       {% csrf_token %}
       <button type="submit" class="btn btn-warning">Borrar</button>

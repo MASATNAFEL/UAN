@@ -28,5 +28,5 @@ class Carpeta(models.Model):
 	observa = models.TextField(blank=True, null=True)
 
 	def str(self):
-    		return str(self.codcarpeta)
+    		return f"{self.codcarpeta}"
 	

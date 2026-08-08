@@ -33,14 +33,14 @@
   </table> 
   <div class="d-flex justify-content-between">
   
-    <form method="post" action="{% url 'borrar' carpeta.cedula_ciudadania%}" onsubmit="return confirmarEliminacion('{{carpeta.cedula_ciudadania}}')">
+    <form method="post" action="{% url 'borrar1' carpeta.codcarpeta %}" onsubmit="return confirmarEliminacion('{{carpeta.codcarpeta}}')">
       {% csrf_token %}
       <button type="submit" class="btn btn-warning">Borrar</button>
     </form>
 </body>
 <script>
-  function confirmarEliminacion(cedula){
-    return confirm("¿Estás seguro que deseas eliminar este registro con la cédula?"+cedula+"")
+  function confirmarEliminacion(carpeta){
+    return confirm("¿Estás seguro que deseas eliminar este registro con la carpeta?"+carpeta+"")
   }
 </script>
 </html>
