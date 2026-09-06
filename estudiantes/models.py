@@ -13,9 +13,20 @@ class Estudiante(models.Model):
 	fecha_actualizacion = models.DateTimeField(auto_now=True)
 	activo = models.BooleanField(default=True)
 
-	def str(self):
+	def __str__(self):
     		return f"{self.nombre} - {self.cedula_ciudadania}"
 
+	def get_fields(self):
+		ocultar = ["fecha_registro", "fecha_actualizacion", "activo"]
+		return [
+            {
+                'name': field.name,
+                'verbose_name': field.verbose_name.title(),
+                'value': getattr(self, field.name),
+            }
+            for field in self._meta.fields
+            if field.name not in ocultar
+        ]
 class Carpeta(models.Model):
 	codcarpeta=models.IntegerField(default=0,primary_key=True)
 	year_start = models.CharField(max_length=4)
@@ -26,7 +37,21 @@ class Carpeta(models.Model):
 	folio = models.IntegerField(default=0)
 	modelo = models.BooleanField(default=True)
 	observa = models.TextField(blank=True, null=True)
+	activo = models.BooleanField(default=True) 
+	fecha_registro = models.DateTimeField(auto_now_add=True)
+	fecha_actualizacion = models.DateTimeField(auto_now=True)
 
 	def str(self):
     		return f"{self.codcarpeta}"
+	def get_fields(self):
+			ocultar = ["fecha_registro", "fecha_actualizacion", "activo"]
+			return [
+				{
+					'name': field.name,
+					'verbose_name': field.verbose_name.title(),
+					'value': getattr(self, field.name),
+				}
+				for field in self._meta.fields
+				if field.name not in ocultar
+			]
 	

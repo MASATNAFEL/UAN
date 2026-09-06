@@ -16,7 +16,18 @@
     <p>no hay estudiantes.</p>
 {% endif %}
 <hr>
-<div><a href="{% url 'buscar' %}">Ir al Buscar estudiantes</a></div>
-<div><div><a href="{% url 'registro' %}">Ir al registro estudiantes</a></div>
+{%if lista_Carpetas%}
+    <ul>
+    {% for carpeta in lista_Carpetas %}
+        <li><a href="/estudiantes/car/{{carpeta.codcarpeta}}/">{{ carpeta.codcarpeta }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>no hay carpetas.</p>
+{% endif %}
+<div><a href="{% url 'buscar' %}">Ir al Buscar estudiantes</a>
+<a href="{% url 'registro' %}">Ir al registro estudiantes</a></div>
+<div><a href="{% url 'consultar' %}">Ver carpetas</a>
+<a href="{% url 'carpeta' %}">Crear carpetas</a></div>
 </body>
 </html>
