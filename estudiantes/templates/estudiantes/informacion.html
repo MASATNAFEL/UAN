@@ -9,44 +9,45 @@
   <h1>informacion estudiante</h1> 
   <table border="1">
     <thead>
+      
       <tr>
-        <th colspan="2">{{estudiante.nombre}}</th>
+        <th colspan="2">{{ listado.pk }}</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>tipo de cédula:</td>
-        <td>{{ estudiante.tipocc }}</td>
+      {% for campo in listado.get_fields %}
+        <tr>
+          <td>{{ campo.verbose_name }}</td>
+          <td>{% if campo.value is True %}
+            <span>Sí</span>
+          {% elif campo.value is False %}
+            <span>No</span>
+          {% elif campo.value != None %}
+            {{ campo.value }}
+          {% else %}
+            <em>No registrado</em>
+         {% endif %}
+         </td>
       </tr>
-      <tr>
-        <td>cédula ciudadania:</td>
-        <td>{{ estudiante.cedula_ciudadania }}</td>
-      </tr>
-       <tr>
-        <td>Programa:</td>
-        <td>{{ estudiante.programa }}</td>
-      </tr>
-       <tr>
-        <td>Contacto:</td>
-        <td>{{ estudiante.contacto }}</td>
-      </tr>
-      <tr>
+    {% endfor %}
+    
+      <!---<tr>
         <td>Carpeta:</td>
         <td><a href="{%url 'carpeta' %}" class="btn btn-warning">Crear carpeta</a></div></td>
-      </tr>
+      </tr>--->
     </tbody>
   </table> 
   <div class="d-flex justify-content-between">
-    <a href="{%url 'editar' estudiante.cedula_ciudadania %}" class="btn btn-warning">Actualizar datos</a></div>
+    <a href="{%url 'editar' listado.pk %}" class="btn btn-warning">Actualizar datos</a></div>
     <a href="{%url 'index' %}" class="btn btn-warning">Regresar a inicio</a></div>
-    <form method="post" action="{% url 'borrar' estudiante.cedula_ciudadania%}" onsubmit="return confirmarEliminacion('{{estudiante.cedula_ciudadania}}')">
+    <form method="post" action="{% url url_borrar listado.pk%}" onsubmit="return confirmarEliminacion('{{listado.get_fields.0.verbose_name}}','{{listado.pk}}')">
       {% csrf_token %}
       <button type="submit" class="btn btn-warning">Borrar</button>
     </form>
 </body>
 <script>
-  function confirmarEliminacion(cedula){
-    return confirm("¿Estás seguro que deseas eliminar este registro con la cédula?"+cedula+"")
+  function confirmarEliminacion(etiqueta,registro){
+    return confirm("¿Estás seguro que deseas eliminar este registro con la " + etiqueta + "? " + registro + "")
   }
 </script>
 </html>

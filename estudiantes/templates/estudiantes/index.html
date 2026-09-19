@@ -7,16 +7,30 @@
 </head>
 <body> 
     {%if lista_Estudiantes%}
-    <ul>
-    {% for estudiante in lista_Estudiantes %}
-        <li><a href="/estudiantes/info/{{ estudiante.cedula_ciudadania }}/">{{ estudiante.nombre }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>no hay estudiantes.</p>
-{% endif %}
-<hr>
-<div><a href="{% url 'buscar' %}">Ir al Buscar estudiantes</a></div>
-<div><div><a href="{% url 'registro' %}">Ir al registro estudiantes</a></div>
+        <ul>
+            {% for estudiante in lista_Estudiantes %}
+                <li><a href="/estudiantes/info/{{ estudiante.cedula_ciudadania }}/">{{ estudiante.nombre }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>no hay estudiantes.</p>
+    {% endif %}
+    <hr>
+    {% if lista_Carpetas %}
+        <hr>
+        <h2>Carpetas</h2>
+        <ul>
+            {% for carpeta in lista_Carpetas %}
+                <li><a href="/estudiantes/car/{{ carpeta.codcarpeta }}/">{{ carpeta.codcarpeta}}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>no hay carpetas.</p>
+    {% endif %}
+</body>
+</html>
+<a href="{% url 'registro' %}">Ir al registro estudiantes</a></div>
+<div><a href="{% url 'consultar' %}">ver carpetas</a>
+<a href="{% url 'carpeta' %}">crear carpetas</a></div>
 </body>
 </html>

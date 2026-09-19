@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="get">
+
+    {% for filtro in filtros %}
+        <div>
+            <label for="{{ filtro.name }}">
+                {{ filtro.label }}:
+            </label>
+
+            <input
+                type="text"
+                name="{{ filtro.name }}"
+                id="{{ filtro.name }}"
+                placeholder="Buscar {{ filtro.label }}..."
+                value="{{ filtro.value }}"
+            >
+        </div>
+    {% endfor %}
+
+    <button type="submit">Buscar</button>
+    <a href="{{ request.path }}">Limpiar filtros</a>
+
+</form>
+
+<hr>
+
+<h3>Resultados:</h3>
+
+{% if resultado %}
+
+<table border="1">
+
+    <thead>
+        <tr>
+            {% for columna in columnas %}
+                <th>{{ columna.label }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for item in resultado %}
+            <tr>
+
+                {% for columna in columnas %}
+                    <td>
+                        {{ item|campo:columna.campo }}
+                    </td>
+                {% endfor %}
+
+            </tr>
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% else %}
+
+    <p>
+        No se encontraron resultados con los criterios ingresados.
+    </p>
+
+{% endif %}
+</body>
+</html>
