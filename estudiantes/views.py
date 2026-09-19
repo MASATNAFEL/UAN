@@ -32,7 +32,7 @@ def editar(request,cedula_ciudadania):
 
 def modificar(request,codcarpeta):
     print(request.method)
-    carpeta = get_object_or_404(carpeta, pk=codcarpeta)
+    carpeta = get_object_or_404(Carpeta, pk=codcarpeta)
 
     if request.method =='POST' :
         form = FormularioCarpeta(request.POST, instance=carpeta)
@@ -54,7 +54,7 @@ def buscar(request):
     if consulta_cedula:
         resultado=resultado.filter(Q(cedula_ciudadania=consulta_cedula))
 
-    context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"resultado":resultado}
+    context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"resultado":resultado,"tipo":"buscar"}
     return render(request,"estudiantes/buscar.html",context)
 
 def consultar(request):
@@ -62,9 +62,9 @@ def consultar(request):
     resultado=Carpeta.objects.order_by("codcarpeta")
 
     if consulta_codcarpeta:
-        resultado=resultado.filter(Q(nombre__icontains=consulta_codcarpeta))
+        resultado=resultado.filter(Q(codcarpeta__icontains=consulta_codcarpeta))
 
-    context={"consulta_codcarpeta":consulta_codcarpeta,"resultado":resultado}
+    context={"consulta_codcarpeta":consulta_codcarpeta,"resultado":resultado,"tipo":"consultar"}
     return render(request,"estudiantes/buscar.html",context)
 
 def addestudiante(request):

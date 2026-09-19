@@ -6,7 +6,6 @@ class Estudiante(models.Model):
 	tipocc=models.CharField(max_length=20)
 	rdoc = models.BooleanField(default=False)
 	programa=models.CharField(max_length=30)
-	codcarpeta=models.CharField(max_length=15)
 	contacto=models.CharField(max_length=15)
 	email=models.EmailField(blank=True, null=True)
 	fecha_registro = models.DateTimeField(auto_now_add=True)
@@ -28,7 +27,8 @@ class Estudiante(models.Model):
             if field.name not in ocultar
         ]
 class Carpeta(models.Model):
-	codcarpeta=models.IntegerField(default=0,primary_key=True)
+	codcarpeta=models.IntegerField(primary_key=True)
+	estudiante=models.ForeignKey(Estudiante, on_delete=models.PROTECT,related_name="carpetas")
 	year_start = models.CharField(max_length=4)
 	year_end = models.CharField(max_length=4, blank=True, null=True)
 	notas = models.BooleanField(default=False)
