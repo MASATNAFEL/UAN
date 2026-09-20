@@ -41,30 +41,27 @@
 <hr>
 <h3>Resultados:</h3>
     
-    {% if resultado %}
+    {% if datos %}
         <table border="1">
     <thead>
       <tr>
-        <th colspan="5">Resultados de la busqueda</th>
+        {% for encabezado in encabezados %}        
+        <th colspan="5">{{encabezado}}</th>
+        {% endfor %}
       </tr>
-	<tr>
-        	<th>Nombre</th>
-        	<th>tipo doc.</th>
-        	<th>cédula</th>
-        	<th>Programa</th>
-        	<th>contacto</th>
-      </tr>
+	
     </thead>
     <tbody>
-            {% for item in resultado %}
+            {% for fila in datos %}
            <tr>
-	        <td><strong>{{ item.nombre }}</strong></td>
-		<td>{{ item.tipocc }}</td>
- 		<td>{{ item.cedula_ciudadania }}</td>
-		<td>{{ item.programa }}</td>
-		<td>{{ item.contacto }}</td>
+            {% for dato in fila %} 
+	        <td>{{ dato }}</td>
+	
             {% endfor %}
-        </ul>
+           </tr>
+            {% endfor %}
+        </tbody>
+        </table>
     {% else %}
         <p>No se encontraron resultados con los criterios ingresados.</p>
     {% endif %}
