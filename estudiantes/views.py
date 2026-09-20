@@ -53,8 +53,8 @@ def buscar(request):
 
     if consulta_cedula:
         resultado=resultado.filter(Q(cedula_ciudadania=consulta_cedula))
-
-    context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"resultado":resultado,"tipo":"buscar"}
+    encabezados, datos = preparar_tabla(resultado)
+    context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"encabezados": encabezados,"datos": datos,"tipo":"buscar"}
     return render(request,"estudiantes/buscar.html",context)
 
 def consultar(request):
@@ -64,7 +64,8 @@ def consultar(request):
     if consulta_codcarpeta:
         resultado=resultado.filter(Q(codcarpeta__icontains=consulta_codcarpeta))
 
-    context={"consulta_codcarpeta":consulta_codcarpeta,"resultado":resultado,"tipo":"consultar"}
+    encabezados, datos = preparar_tabla(resultado)
+    context={"consulta_codcarpeta":consulta_codcarpeta,"encabezados": encabezados,"datos": datos,"tipo":"consultar"}
     return render(request,"estudiantes/buscar.html",context)
 
 def addestudiante(request):
@@ -98,3 +99,26 @@ def eliminar(request, codcarpeta):
         carpeta.activo=False
         carpeta.save()
         return redirect("index")
+
+def preparar_tabla(resultado):
+    if not resultado:
+        return [], []
+
+    modelo = resultado.model
+
+    campos = modelo._meta.fields
+
+    encabezados = [
+        campo.verbose_name
+        for campo in campos
+    ]
+
+    datos = [
+        [
+            getattr(objeto, campo.name)
+            for campo in campos
+        ]
+        for objeto in resultado
+    ]
+
+    return encabezados, datos
