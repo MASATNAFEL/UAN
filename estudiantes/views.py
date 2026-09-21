@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404,render,redirect
 
 def index(request):
     lista_Estudiantes = Estudiante.objects.filter(activo=True).order_by("nombre")
-    lista_Carpetas = Carpeta.objects.filter(activo=True).order_by("codcarpeta")
+    lista_Carpetas = Carpeta.objects.order_by("codcarpeta")
     context = {"lista_Estudiantes":lista_Estudiantes,"lista_Carpetas":lista_Carpetas}
     return render(request,"estudiantes/index.html",context)
     
@@ -53,8 +53,8 @@ def buscar(request):
 
     if consulta_cedula:
         resultado=resultado.filter(Q(cedula_ciudadania=consulta_cedula))
-    encabezados, datos = preparar_tabla(resultado)
-    context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"encabezados": encabezados,"datos": datos,"tipo":"buscar"}
+    encabezados,datos=preparar_tabla(resultado)
+    context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"encabezados":encabezados,"datos":datos,"tipo":"buscar"}
     return render(request,"estudiantes/buscar.html",context)
 
 def consultar(request):
@@ -63,9 +63,8 @@ def consultar(request):
 
     if consulta_codcarpeta:
         resultado=resultado.filter(Q(codcarpeta__icontains=consulta_codcarpeta))
-
-    encabezados, datos = preparar_tabla(resultado)
-    context={"consulta_codcarpeta":consulta_codcarpeta,"encabezados": encabezados,"datos": datos,"tipo":"consultar"}
+    encabezados,datos=preparar_tabla(resultado)
+    context={"consulta_codcarpeta":consulta_codcarpeta,"encabezados":encabezados,"datos":datos,"tipo":"consultar"}
     return render(request,"estudiantes/buscar.html",context)
 
 def addestudiante(request):
@@ -99,7 +98,6 @@ def eliminar(request, codcarpeta):
         carpeta.activo=False
         carpeta.save()
         return redirect("index")
-
 def preparar_tabla(resultado):
     if not resultado:
         return [], []

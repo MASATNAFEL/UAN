@@ -42,25 +42,26 @@
 <h3>Resultados:</h3>
     
     {% if datos %}
-    <table border="1">
+        <table border="1">
     <thead>
-        <tr>
-            {% for encabezado in encabezados %}
-                <th>{{ encabezado }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for fila in datos %}
-            <tr>
-                {% for dato in fila %}
-                    <td>{{ dato }}</td>
-                {% endfor %}
-            </tr>
+      <tr>
+        {% for encabezado in encabezados %}        
+        <th colspan="5">{{encabezado}}</th>
         {% endfor %}
-    </tbody>
-    </table>
+      </tr>
+	
+    </thead>
+    <tbody>
+            {% for fila in datos %}
+           <tr>
+            {% for dato in fila %} 
+	        <td>{{ dato }}</td>
+	
+            {% endfor %}
+           </tr>
+            {% endfor %}
+        </tbody>
+        </table>
     {% else %}
         <p>No se encontraron resultados con los criterios ingresados.</p>
     {% endif %}
