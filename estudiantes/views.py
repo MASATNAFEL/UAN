@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from .models import Estudiante,Carpeta
 from .forms import FormularioEstudiante, FormularioCarpeta
 from django.db.models import Q
@@ -11,16 +10,14 @@ def index(request):
     return render(request,"estudiantes/index.html",context)
     
 def informacion(request,cedula_ciudadania):
-    listado=get_object_or_404(Estudiante,pk=cedula_ciudadania)
-    return render(request,"estudiantes/informacion.html", {"listado":listado,"url_borrar":"borrar"})
+    listado=get_object_or_404(Estudiante,pk=cedula_ciudadania,activo=True)
+    return render(request,"estudiantes/informacion.html", {"listado":listado,"url_editar":"editar","url_borrar":"borrar"})
 def infocarpeta(request,codcarpeta):
     listado=get_object_or_404(Carpeta,pk=codcarpeta)
-    return render(request,"estudiantes/informacion.html", {"listado":listado,"url_borrar":"eliminar"})
+    return render(request,"estudiantes/informacion.html", {"listado":listado,"url_editar":"modificar","url_borrar":"eliminar"})
 
 def editar(request,cedula_ciudadania):
-    print(request.method)
     estudiante = get_object_or_404(Estudiante, pk=cedula_ciudadania)
-
     if request.method =='POST' :
         form = FormularioEstudiante(request.POST, instance=estudiante)
         if form.is_valid():
@@ -31,19 +28,23 @@ def editar(request,cedula_ciudadania):
     return render(request, 'estudiantes/editar.html', {'form': form,'estudiante':estudiante})
 
 def modificar(request,codcarpeta):
-    print(request.method)
     carpeta = get_object_or_404(Carpeta, pk=codcarpeta)
-
     if request.method =='POST' :
         form = FormularioCarpeta(request.POST, instance=carpeta)
         if form.is_valid():
             form.save()
-            return redirect('informacion',carpeta.pk)
+            return redirect('infocarpeta',carpeta.pk)
     else:
         form = FormularioCarpeta(instance=carpeta)
     return render(request, 'estudiantes/editar.html', {'form': form,'carpeta':carpeta})
 
 def buscar(request):
+    """
+    Busca estudiantes activos utilizando nombre y/o número de cédula.
+
+    Los registros inactivos no participan en las búsquedas normales
+    de la plataforma porque son gestionados mediante eliminación lógica.
+    """
     consulta_nombre=request.GET.get("n","")
     consulta_cedula=request.GET.get("c","")
     resultado=Estudiante.objects.filter(activo=True).order_by("nombre")
@@ -87,6 +88,13 @@ def addcarpeta(request):
     return render(request,"estudiantes/registro.html",{"form":form})
 
 def borrar(request, cedula_ciudadania):
+    """
+    Desactiva lógicamente un estudiante.
+
+    El registro no se elimina de la base de datos. Se establece
+    'activo=False', provocando que deje de aparecer en los listados
+    normales de la plataforma.
+    """
     if request.method=="POST":
         estudiante=get_object_or_404(Estudiante,pk=cedula_ciudadania)
         estudiante.activo=False

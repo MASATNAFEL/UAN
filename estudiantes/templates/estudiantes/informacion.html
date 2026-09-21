@@ -33,7 +33,7 @@
     </tbody>
   </table> 
   <div class="d-flex justify-content-between">
-    <a href="{%url 'editar' listado.pk %}" class="btn btn-warning">Actualizar datos</a></div>
+    <a href="{%url url_editar listado.pk %}" class="btn btn-warning">Actualizar datos</a></div>
     <a href="{%url 'index' %}" class="btn btn-warning">Regresar a inicio</a></div>
     <form method="post" action="{% url url_borrar listado.pk %}" onsubmit="return confirmarEliminacion('{{listado.get_fields.0.verbose_name}}','{{ listado.pk }}')">
       {% csrf_token %}
