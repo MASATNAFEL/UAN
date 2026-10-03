@@ -1,33 +1,88 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body> 
-    {%if lista_Estudiantes%}
-    <ul>
-    {% for estudiante in lista_Estudiantes %}
-        <li><a href="{% url 'informacion' estudiante.cedula_ciudadania %}">{{ estudiante.nombre }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>no hay estudiantes.</p>
-{% endif %}
-<hr>
-{%if lista_Carpetas%}
-    <ul>
-    {% for carpeta in lista_Carpetas %}
-        <li><a href="{% url 'infocarpeta' carpeta.codcarpeta %}">{{ carpeta.codcarpeta }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>no hay carpetas.</p>
-{% endif %}
-<div><a href="{% url 'buscar' %}">Ir al Buscar estudiantes</a>
-<a href="{% url 'registro' %}">Ir al registro estudiantes</a></div>
-<div><a href="{% url 'consultar' %}">Ver carpetas</a>
-<a href="{% url 'carpeta' %}">Crear carpetas</a></div>
-</body>
-</html>
+{% extends "estudiantes/home.html" %}
+{% block title %}Panel de estudiantes - SGEIUAN{% endblock %}
+{% block content %} 
+<div class="panel-container"> 
+    <div class="panel-header">
+        <h2 id="listado-title">Listado Estudiantes</h2>
+    </div>
+    <div class="table-responsive">    
+        {% if lista_Estudiantes %}
+            <table class="custom-table">
+                <thead>       
+                    <th>Nombre Completo</th>
+                    <th>Identificación</th>
+                    <th style="text-align: right;">Acciones</th>
+                </thead>
+                <tbody>
+                {% for estudiante in lista_Estudiantes %}
+                    <tr>
+                        <td>
+                            <strong>{{estudiante.nombre}}</strong>
+                        </td>
+                        <td>
+                            <strong>{{estudiante.cedula_ciudadania}}</strong>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'informacion' estudiante.cedula_ciudadania %}" class="student_link">Ver detalles -></a>
+                        </td>
+                    </tr>   
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+        <div class="empty-state">
+            <p style="font-size: 1.1rem;margin-bottom: 0.5rem;">no hay estudiantes registrados en la base de datos.</p>
+            <small>usa el botón inferior para añadir uno nuevo</small>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div class="panel-container"> 
+    <div class="panel-header">
+        <h2 id="listado-title">Listado carpetas</h2>
+    </div>
+    <div class="table-responsive">    
+        {% if lista_Carpetas %}
+            <table class="custom-table">
+                <thead>       
+                    <th>Código</th>
+                    <th style="text-align: right;">Acciones</th>
+                </thead>
+                <tbody>
+                {% for carpeta in lista_Carpetas %}
+                <tr>
+                        <td>
+                            <strong>{{carpeta.cod_carpeta}}</strong>
+                        </td>
+                        <td style="text-align: right;"></td>
+                            <a href="{% url 'infocarpeta' carpeta.codcarpeta %}" class="student_link">Ver detalles -></a>
+                        </td>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <p style="font-size: 1.1rem;margin-bottom: 0.5rem;">no hay carpetas registradas en la base de datos.</p>
+                <small>usa el botón inferior para añadir una nueva</small>
+            </div>
+        {% endif %}
+        <!-- Barra de navegación inferior entre módulos -->
+    <div class="actions-bar">
+        <a href="{% url 'buscar' %}" class="btn-nav">
+            🔍 Buscar estudiante
+        </a>
+        <a href="{% url 'consultar' %}" class="btn-nav">
+            🔍 Buscar carpeta
+        </a>
+        <a href="{% url 'registro' %}" class="btn-nav">
+            ➕ Registrar estudiante
+        </a>
+        <a href="{% url 'carpeta' %}" class="btn-nav">
+            ➕ Registrar carpeta
+        </a>
+        <a href="{% url 'logout' %}" class="btn-nav">
+            &times Cerrar Sesión
+        </a>
+    </div>
+</div>
+{% endblock %}

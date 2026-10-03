@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ["*",".onrender.com","localhost","127.0.0.1"]
 
 INSTALLED_APPS = [
     'estudiantes.apps.EstudiantesConfig',
+    'cuentas',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

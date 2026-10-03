@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body> 
+    {%if lista_Estudiantes%}
+    <ul>
+    {% for estudiante in lista_Estudiantes %}
+        <li><a href="{% url 'informacion' estudiante.cedula_ciudadania %}">{{ estudiante.nombre }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>no hay estudiantes.</p>
+{% endif %}
+<hr>
+{%if lista_Carpetas%}
+    <ul>
+    {% for carpeta in lista_Carpetas %}
+        <li><a href="{% url 'infocarpeta' carpeta.codcarpeta %}">{{ carpeta.codcarpeta }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>no hay carpetas.</p>
+{% endif %}
+<div><a href="{% url 'buscar' %}">Ir al Buscar estudiantes</a>
+<a href="{% url 'registro' %}">Ir al registro estudiantes</a></div>
+<div><a href="{% url 'consultar' %}">Ver carpetas</a>
+<a href="{% url 'carpeta' %}">Crear carpetas</a></div>
+<div><a href="{% url 'logout' %}">Cerrar sesión</a></div>
+</body>
+</html>

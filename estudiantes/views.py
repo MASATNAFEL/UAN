@@ -2,20 +2,23 @@ from .models import Estudiante,Carpeta
 from .forms import FormularioEstudiante, FormularioCarpeta
 from django.db.models import Q
 from django.shortcuts import get_object_or_404,render,redirect
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def index(request):
     lista_Estudiantes = Estudiante.objects.filter(activo=True).order_by("nombre")
     lista_Carpetas = Carpeta.objects.order_by("codcarpeta")
     context = {"lista_Estudiantes":lista_Estudiantes,"lista_Carpetas":lista_Carpetas}
     return render(request,"estudiantes/index.html",context)
-    
+@login_required   
 def informacion(request,cedula_ciudadania):
     listado=get_object_or_404(Estudiante,pk=cedula_ciudadania,activo=True)
     return render(request,"estudiantes/informacion.html", {"listado":listado,"url_editar":"editar","url_borrar":"borrar"})
+@login_required
 def infocarpeta(request,codcarpeta):
     listado=get_object_or_404(Carpeta,pk=codcarpeta)
     return render(request,"estudiantes/informacion.html", {"listado":listado,"url_editar":"modificar","url_borrar":"eliminar"})
-
+@login_required
 def editar(request,cedula_ciudadania):
     estudiante = get_object_or_404(Estudiante, pk=cedula_ciudadania)
     if request.method =='POST' :
@@ -26,7 +29,7 @@ def editar(request,cedula_ciudadania):
     else:
         form = FormularioEstudiante(instance=estudiante)
     return render(request, 'estudiantes/editar.html', {'form': form,'estudiante':estudiante})
-
+@login_required
 def modificar(request,codcarpeta):
     carpeta = get_object_or_404(Carpeta, pk=codcarpeta)
     if request.method =='POST' :
@@ -37,7 +40,7 @@ def modificar(request,codcarpeta):
     else:
         form = FormularioCarpeta(instance=carpeta)
     return render(request, 'estudiantes/editar.html', {'form': form,'carpeta':carpeta})
-
+@login_required
 def buscar(request):
     """
     Busca estudiantes activos utilizando nombre y/o número de cédula.
@@ -57,7 +60,7 @@ def buscar(request):
     encabezados,datos=preparar_tabla(resultado)
     context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"encabezados":encabezados,"datos":datos,"tipo":"buscar"}
     return render(request,"estudiantes/buscar.html",context)
-
+@login_required
 def consultar(request):
     consulta_codcarpeta=request.GET.get("a","")
     resultado=Carpeta.objects.order_by("codcarpeta")
@@ -67,7 +70,7 @@ def consultar(request):
     encabezados,datos=preparar_tabla(resultado)
     context={"consulta_codcarpeta":consulta_codcarpeta,"encabezados":encabezados,"datos":datos,"tipo":"consultar"}
     return render(request,"estudiantes/buscar.html",context)
-
+@login_required
 def addestudiante(request):
     if request.method=="POST":
         form = FormularioEstudiante(request.POST)
@@ -77,6 +80,7 @@ def addestudiante(request):
     else:
         form=FormularioEstudiante()
     return render(request,"estudiantes/registro.html",{"form":form})
+@login_required
 def addcarpeta(request):
     if request.method=="POST":
         form = FormularioCarpeta(request.POST)
@@ -86,7 +90,7 @@ def addcarpeta(request):
     else:
         form=FormularioCarpeta()
     return render(request,"estudiantes/registro.html",{"form":form})
-
+@login_required
 def borrar(request, cedula_ciudadania):
     """
     Desactiva lógicamente un estudiante.
@@ -100,12 +104,14 @@ def borrar(request, cedula_ciudadania):
         estudiante.activo=False
         estudiante.save()
         return redirect("index")
+@login_required    
 def eliminar(request, codcarpeta):
     if request.method=="POST":
         carpeta=get_object_or_404(Carpeta,pk=codcarpeta)
         carpeta.activo=False
         carpeta.save()
         return redirect("index")
+@login_required
 def preparar_tabla(resultado):
     if not resultado:
         return [], []
