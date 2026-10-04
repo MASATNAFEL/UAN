@@ -1,48 +1,67 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>informacion</title>
-</head>
-<body>
-  <h1>informacion estudiante</h1> 
-  <table border="1">
-    <thead>
-      <tr>
-        <th colspan="2">{{ listado.pk }}</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% extends "estudiantes/home.html" %}
+  {% block title %} Expedientes {% endblock %}
+  {% block content %}
+  <div class="profile-card">
+    <div class="profile-header">
+      <h2 id="listado-title"> Detalles Del Expendiente </h2>
+      <p id="inftexest"> {{listado.pk}}</p>
+    </div>
+  <div class="profile-body">
+    <div class="info-grid">
       {% for campo in listado.get_fields %}
-      <tr>
-        <td>{{ campo.verbose_name}}</td>
-        <td>{% if campo.value is True %}
-          <span>Sí</span>
-        {% elif campo.value is False %}
-          <span>No</span>
-        {% elif campo.value != None %}
-          {{ campo.value}}
-        {% else %}
-          <em>No registrado</em>
-        {% endif %}
-        </td>
-      </tr>
+        <div class="info-item">
+          <div class="info-label">
+            {{ campo.verbose_name}}
+          </div>
+          <div class="info-value">
+            {% if campo.value is True %}
+              <span style="color: #08822a;font-weight: 600;">Sí</span>
+            {% elif campo.value is False %}
+              <span style="color: #700606;font-weight: 600;">No</span>
+            {% elif campo.value != None %}
+              {{ campo.value}}
+            {% else %}
+              <em style="color: #626263;">No registrado</em>
+            {% endif %}
+          </div>
+        </div>
       {% endfor %}
+    </div>
 
-    </tbody>
-  </table> 
-  <div class="d-flex justify-content-between">
-    <a href="{%url url_editar listado.pk %}" class="btn btn-warning">Actualizar datos</a></div>
-    <a href="{%url 'index' %}" class="btn btn-warning">Regresar a inicio</a></div>
-    <form method="post" action="{% url url_borrar listado.pk %}" onsubmit="return confirmarEliminacion('{{listado.get_fields.0.verbose_name}}','{{ listado.pk }}')">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-warning">Borrar</button>
-    </form>
-</body>
-<script>
-  function confirmarEliminacion(etiqueta,registro){
-    return confirm("¿Estás seguro que deseas eliminar este registro con la "+etiqueta+"?"+registro+"")
-  }
-</script>
-</html>
+  <div class="actions-container">
+    <!--Volver-->
+    <a href="{%url 'index' %}" class="btn btn-secondary">Regresar a inicio</a>
+    <!--Actualizar-->
+    <a href="{%url url_editar listado.pk %}" class="btn btn-warning">Actualizar datos</a>
+    <!--Eliminar (dispara el modal)-->
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</button>
+  </div>
+  </div>
+  </div>
+  <!--Modal de confirmación de eliminación-->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-danger">
+          <h5 class="modal-title" id="deleteModalLabel"> Confirmar eliminación </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="cerrar"></button>
+        </div>
+        <div class="modal-body text-center p-4">
+        <p style="font-size: 1.1rem;color:#0f172a;margin-bottom: 0.5rem;"> ¿Estás seguro que deseas eliminar el registro asociado a <strong>{{listado.get_fields.0.verbose_name}}</strong> {{listado.pk}}?</p>
+        <small class="text-muted">El registro dejará de ser visible en el listado general del sistema</small>
+        </div>
+        <div class="modal-footer justify-content-center border-0 pb-4">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="flex:0 0 120px;">
+            Cancelar
+          </button>
+          <!--Formulario post seguro-->
+          <form method="post" action="{% url url_borrar listado.pk %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" style="flex:0 0 120px;">Si, eliminar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+<!--<form method="post" action="{% url url_borrar listado.pk %}" onsubmit="return confirmarEliminacion('{{listado.get_fields.0.verbose_name}}','{{ listado.pk }}')"></form>

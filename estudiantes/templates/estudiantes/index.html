@@ -37,35 +37,6 @@
         {% endif %}
     </div>
 </div>
-<div class="panel-container"> 
-    <div class="panel-header">
-        <h2 id="listado-title">Listado carpetas</h2>
-    </div>
-    <div class="table-responsive">    
-        {% if lista_Carpetas %}
-            <table class="custom-table">
-                <thead>       
-                    <th>Código</th>
-                    <th style="text-align: right;">Acciones</th>
-                </thead>
-                <tbody>
-                {% for carpeta in lista_Carpetas %}
-                <tr>
-                        <td>
-                            <strong>{{carpeta.cod_carpeta}}</strong>
-                        </td>
-                        <td style="text-align: right;"></td>
-                            <a href="{% url 'infocarpeta' carpeta.codcarpeta %}" class="student_link">Ver detalles -></a>
-                        </td>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="empty-state">
-                <p style="font-size: 1.1rem;margin-bottom: 0.5rem;">no hay carpetas registradas en la base de datos.</p>
-                <small>usa el botón inferior para añadir una nueva</small>
-            </div>
-        {% endif %}
         <!-- Barra de navegación inferior entre módulos -->
     <div class="actions-bar">
         <a href="{% url 'buscar' %}" class="btn-nav">
@@ -81,7 +52,7 @@
             ➕ Registrar carpeta
         </a>
         <a href="{% url 'logout' %}" class="btn-nav">
-            &times Cerrar Sesión
+             Cerrar Sesión
         </a>
     </div>
 </div>
