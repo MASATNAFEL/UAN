@@ -86,6 +86,7 @@
                             {% for encabezado in encabezados %}
                                 <th>{{ encabezado }}</th>
                             {% endfor %}
+                            <th>Acciones</th>
                         </tr>
                     </thead>
 
@@ -95,7 +96,11 @@
                                 {% for dato in fila %}
                                     <td>{{ dato }}</td>
                                 {% endfor %}
+                                 <td>
+                                <a href="{% url 'informacion' fila.0 %}" class="student_link">Ver detalles -></a>
+                                </td>
                             </tr>
+                           
                         {% endfor %}
                     </tbody>
 

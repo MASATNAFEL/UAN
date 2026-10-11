@@ -122,12 +122,14 @@ def preparar_tabla(resultado):
     encabezados = [
         campo.verbose_name
         for campo in campos
+            if campo .name not in ["activo", "fecha_registro", "fecha_actualizacion"]
     ]
 
     datos = [
         [
             getattr(objeto, campo.name)
             for campo in campos
+                if campo .name not in ["activo","fecha_registro","fecha_actualizacion"]
         ]
         for objeto in resultado
     ]
