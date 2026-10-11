@@ -1,26 +1,57 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
- <h1>iniciar seción</h1>  
- {% if error %}
- <p>{{ error }}</p>
- {% endif %}
- <form method="POST">
-    {% csrf_token %}
-    <div>
-        <label>usuario:</label>
-        <input type="text" name="username" required>
-    </div>
-    <div>
-        <label>contraseña:</label>
-        <input type="password" name="password" required>
-    </div>
-    <button type="submit">iniciar sesión</button>
- </form> 
-</body>
-</html>
+
+{% extends "estudiantes/home.html" %}
+{% load static %}
+{% block title %}Login - SGEIUAN{% endblock %}
+{% block content %} 
+ <div class="login-container">
+    <div class="login-card">
+
+        <div class="login-header">
+            <h1>Iniciar sesión</h1>
+            <p>SGEIUAN - Sistema de Gestión Estudiantil</p>
+        </div>
+
+        <div class="login-body">
+
+            {% if error %}
+                <div class="login-error">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <form method="POST" class="login-form">
+                {% csrf_token %}
+
+                <div class="login-field">
+                    <label for="username">Usuario</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Ingresa tu usuario"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="login-field">
+                    <label for="password">Contraseña</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Ingresa tu contraseña"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary login-button">
+                    Iniciar sesión
+                </button>
+            </form>
+
+        </div>
+        </div>
+        </div>
+ {% endblock %}

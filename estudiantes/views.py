@@ -111,7 +111,6 @@ def eliminar(request, codcarpeta):
         carpeta.activo=False
         carpeta.save()
         return redirect("index")
-@login_required
 def preparar_tabla(resultado):
     if not resultado:
         return [], []

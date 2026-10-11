@@ -1,70 +1,113 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-<form action="" method="GET">
+{% extends "estudiantes/home.html" %}
+{% load static %}
+{% block title %}Búsqueda de registros - SGEIUAN{% endblock %}
+{% block content %}
 
-    <div {% if tipo != "buscar" %}hidden{% endif %}>
-        <label for="n">Nombre:</label>
-        <input type="text"
-               name="n"
-               id="n"
-               placeholder="Buscar Nombre..."
-               value="{{ consulta_nombre }}">
+<div class="search-card">
+
+    <!-- Encabezado -->
+    <div class="search-header">
+        <h2>Consulta de registros</h2>
+        <p>Busca información utilizando los criterios disponibles.</p>
     </div>
 
-    <div {% if tipo != "buscar" %}hidden{% endif %}>
-        <label for="c">Cedula:</label>
-        <input type="text"
-               name="c"
-               id="c"
-               placeholder="Buscar Cedula..."
-               value="{{ consulta_cedula }}">
+    <!-- Formulario de búsqueda -->
+    <div class="search-body">
+
+        <form action="" method="GET" class="search-form">
+
+            <div class="filter-grid">
+
+                {% if tipo == "buscar" %}
+                    <div class="search-field">
+                        <label for="n">Nombre</label>
+                        <input
+                            type="text"
+                            name="n"
+                            id="n"
+                            placeholder="Buscar por nombre..."
+                            value="{{ consulta_nombre }}"
+                        >
+                    </div>
+
+                    <div class="search-field">
+                        <label for="c">Cédula</label>
+                        <input
+                            type="text"
+                            name="c"
+                            id="c"
+                            placeholder="Buscar por cédula..."
+                            value="{{ consulta_cedula }}"
+                        >
+                    </div>
+                {% endif %}
+
+                {% if tipo == "consultar" %}
+                    <div class="search-field">
+                        <label for="codcarpeta">Código de carpeta</label>
+                        <input
+                            type="text"
+                            name="codcarpeta"
+                            id="codcarpeta"
+                            placeholder="Buscar por código de carpeta..."
+                            value="{{ consulta_codcarpeta }}"
+                        >
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">
+                    Buscar
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- Resultados -->
+<div class="search-card">
+
+    <div class="search-header">
+        <h2>Resultados de la búsqueda</h2>
     </div>
 
-    <div {% if tipo != "consultar" %}hidden{% endif %}>
-        <label for="codcarpeta">CodCarpeta:</label>
-        <input type="text"
-               name="codcarpeta"
-               id="codcarpeta"
-               placeholder="Buscar CodCarpeta..."
-               value="{{ consulta_codcarpeta }}">
+    <div class="search-body">
+
+        {% if datos %}
+            <div class="table-container">
+                <table class="custom-table">
+
+                    <thead>
+                        <tr>
+                            {% for encabezado in encabezados %}
+                                <th>{{ encabezado }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for fila in datos %}
+                            <tr>
+                                {% for dato in fila %}
+                                    <td>{{ dato }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        {% else %}
+            <div class="search-empty">
+                <p>No se encontraron resultados con los criterios ingresados.</p>
+            </div>
+        {% endif %}
+
     </div>
-
-    <button type="submit">Buscar</button>
-
-</form>
-<hr>
-<h3>Resultados:</h3>
-    
-    {% if datos %}
-        <table border="1">
-    <thead>
-      <tr>
-        {% for encabezado in encabezados %}        
-        <th>{{encabezado}}</th>
-        {% endfor %}
-      </tr>
-	
-    </thead>
-    <tbody>
-            {% for fila in datos %}
-           <tr>
-            {% for dato in fila %} 
-	        <td>{{ dato }}</td>
-	
-            {% endfor %}
-           </tr>
-            {% endfor %}
-        </tbody>
-        </table>
-    {% else %}
-        <p>No se encontraron resultados con los criterios ingresados.</p>
-    {% endif %}
-    
-</body>
-</html>
+</div>
+{% endblock %}

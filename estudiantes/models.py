@@ -5,7 +5,7 @@ class Estudiante(models.Model):
     Representa un estudiante registrado en el sistema.
 
     Los estudiantes no se eliminan físicamente de la base de datos.
-    El campo 'activo' permite realizar una eliminación lógica:
+    El campo 'activo' permite realizar un a eliminación lógica:
     los registros inactivos dejan de mostrarse en la plataforma,
     pero permanecen disponibles para administración desde Django Admin.
     """
