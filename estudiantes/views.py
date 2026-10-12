@@ -1,11 +1,15 @@
 from .models import Estudiante,Carpeta
 from .forms import FormularioEstudiante, FormularioCarpeta
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404,render,redirect
-from django.contrib.auth.decorators import login_required, permission_required  
+from django.contrib.auth.decorators import login_required, permission_required
+from django.views.decorators.http import require_POST
+from django.http import HttpResponseForbidden
 
 @login_required
 @permission_required('estudiantes.view_estudiante', raise_exception=True)
+@permission_required('estudiantes.view_carpeta', raise_exception=True)
 def index(request):
     lista_Estudiantes = Estudiante.objects.filter(activo=True).order_by("nombre")
     lista_Carpetas = Carpeta.objects.order_by("codcarpeta")
@@ -54,29 +58,82 @@ def buscar(request):
     Los registros inactivos no participan en las búsquedas normales
     de la plataforma porque son gestionados mediante eliminación lógica.
     """
-    consulta_nombre=request.GET.get("n","")
-    consulta_cedula=request.GET.get("c","")
-    resultado=Estudiante.objects.filter(activo=True).order_by("nombre")
+    consulta_nombre = request.GET.get("n", "")
+    consulta_cedula = request.GET.get("c", "")
+    ver_inactivos = (
+        request.GET.get("estado") == "inactivos"
+        and request.user.is_superuser
+    )
+
+    resultado = Estudiante.objects.filter(
+        activo=False if ver_inactivos else True
+    ).order_by("nombre")
 
     if consulta_nombre:
-        resultado=resultado.filter(Q(nombre__icontains=consulta_nombre))
+        resultado = resultado.filter(
+            nombre__icontains=consulta_nombre
+        )
 
     if consulta_cedula:
-        resultado=resultado.filter(Q(cedula_ciudadania=consulta_cedula))
-    encabezados,datos=preparar_tabla(resultado)
-    context={"consulta_nombre":consulta_nombre,"consulta_cedula":consulta_cedula,"encabezados":encabezados,"datos":datos,"tipo":"buscar"}
-    return render(request,"estudiantes/buscar.html",context)
+        resultado = resultado.filter(
+            cedula_ciudadania=consulta_cedula
+        )
+
+    encabezados, datos = preparar_tabla(resultado)
+
+    context = {
+        "consulta_nombre": consulta_nombre,
+        "consulta_cedula": consulta_cedula,
+        "encabezados": encabezados,
+        "datos": datos,
+        "resultado": resultado,
+        "urls": "informacion",
+        "tipo": "buscar",
+        "ver_inactivos": ver_inactivos,
+        "es_superusuario": request.user.is_superuser,
+    }
+
+    return render(
+        request,
+        "estudiantes/buscar.html",
+        context
+    )
 @login_required
 @permission_required('estudiantes.view_carpeta', raise_exception=True)
 def consultar(request):
-    consulta_codcarpeta=request.GET.get("a","")
-    resultado=Carpeta.objects.order_by("codcarpeta")
+    consulta_codcarpeta = request.GET.get("a", "")
+    ver_inactivos = (
+        request.GET.get("estado") == "inactivos"
+        and request.user.is_superuser
+    )
+
+    resultado = Carpeta.objects.filter(
+        activo=False if ver_inactivos else True
+    ).order_by("codcarpeta")
 
     if consulta_codcarpeta:
-        resultado=resultado.filter(Q(codcarpeta__icontains=consulta_codcarpeta))
-    encabezados,datos=preparar_tabla(resultado)
-    context={"consulta_codcarpeta":consulta_codcarpeta,"encabezados":encabezados,"datos":datos,"tipo":"consultar"}
-    return render(request,"estudiantes/buscar.html",context)
+        resultado = resultado.filter(
+            codcarpeta__icontains=consulta_codcarpeta
+        )
+
+    encabezados, datos = preparar_tabla(resultado)
+
+    context = {
+        "consulta_codcarpeta": consulta_codcarpeta,
+        "encabezados": encabezados,
+        "datos": datos,
+        "resultado": resultado,
+        "urls": "infocarpeta",
+        "tipo": "consultar",
+        "ver_inactivos": ver_inactivos,
+        "es_superusuario": request.user.is_superuser,
+    }
+
+    return render(
+        request,
+        "estudiantes/buscar.html",
+        context
+    )
 @login_required
 @permission_required('estudiantes.add_estudiante', raise_exception=True)
 def addestudiante(request):
@@ -101,6 +158,7 @@ def addcarpeta(request):
     return render(request,"estudiantes/registro.html",{"form":form})
 @login_required
 @permission_required('estudiantes.change_estudiante', raise_exception=True)
+@require_POST
 def borrar(request, cedula_ciudadania):
     """
     Desactiva lógicamente un estudiante.
@@ -109,19 +167,80 @@ def borrar(request, cedula_ciudadania):
     'activo=False', provocando que deje de aparecer en los listados
     normales de la plataforma.
     """
-    if request.method=="POST":
-        estudiante=get_object_or_404(Estudiante,pk=cedula_ciudadania)
-        estudiante.activo=False
-        estudiante.save()
-        return redirect("index")
+    estudiante=get_object_or_404(Estudiante,pk=cedula_ciudadania)
+    estudiante.activo=False
+    estudiante.save()
+    return redirect("index")
 @login_required
 @permission_required('estudiantes.change_carpeta', raise_exception=True)
+@require_POST
 def eliminar(request, codcarpeta):
-    if request.method=="POST":
-        carpeta=get_object_or_404(Carpeta,pk=codcarpeta)
-        carpeta.activo=False
-        carpeta.save()
-        return redirect("index")
+    carpeta=get_object_or_404(Carpeta,pk=codcarpeta)
+    carpeta.activo=False
+    carpeta.save()
+    return redirect("index")
+
+@login_required
+@require_POST
+def restaurar_estudiante(request, cedula_ciudadania):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden(
+            "Solo el superusuario puede restaurar estudiantes."
+        )
+
+    estudiante = get_object_or_404(
+        Estudiante,
+        pk=cedula_ciudadania,
+        activo=False
+    )
+
+    estudiante.activo = True
+    estudiante.save()
+
+    return redirect("index")
+
+
+@login_required
+@require_POST
+def restaurar_carpeta(request, codcarpeta):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden(
+            "Solo el superusuario puede restaurar carpetas."
+        )
+
+    carpeta = get_object_or_404(
+        Carpeta,
+        pk=codcarpeta,
+        activo=False
+    )
+
+    carpeta.activo = True
+    carpeta.save()
+
+    return redirect("index")
+@login_required
+def registros_inactivos(request):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden(
+            "No tienes permiso para consultar registros inactivos."
+        )
+
+    estudiantes = Estudiante.objects.filter(
+        activo=False
+    ).order_by("nombre")
+
+    carpetas = Carpeta.objects.filter(
+        activo=False
+    ).order_by("codcarpeta")
+
+    return render(
+        request,
+        "estudiantes/registros_inactivos.html",
+        {
+            "estudiantes": estudiantes,
+            "carpetas": carpetas,
+        }
+    )
 def preparar_tabla(resultado):
     if not resultado:
         return [], []

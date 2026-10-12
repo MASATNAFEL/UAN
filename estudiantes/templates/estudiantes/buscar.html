@@ -54,10 +54,24 @@
                         >
                     </div>
                 {% endif %}
-
+                
             </div>
 
-            <div class="filter-actions">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <a href="javascript:history.back()"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Volver
+                            </a>
+                {% if es_superusuario %}
+                    {% if ver_inactivos %}
+                        <a href="?">Ver registros activos</a>
+                    {% else %}
+                        <a href="?estado=inactivos">
+                            Ver registros desactivados
+                        </a>
+                    {% endif %}
+                {% endif %}
                 <button type="submit" class="btn btn-primary">
                     Buscar
                 </button>
@@ -102,7 +116,7 @@
 
                                 <td class="actions-cell">
                                     <a
-                                        href="{% url 'informacion' fila.0 %}"
+                                        href="{% url urls fila.0 %}"
                                         class="btn btn-info"
                                         title="Ver detalles del registro"
                                         aria-label="Ver detalles del registro"

@@ -20,5 +20,8 @@ urlpatterns = [
     # Registro
     path("registro/", views.addestudiante, name="registro"),
     path("carpeta/", views.addcarpeta, name="carpeta"),
+    path("registros-inactivos/",views.registros_inactivos,name="registros_inactivos"),
+    path("restaurar-estudiante/<str:cedula_ciudadania>/",views.restaurar_estudiante,name="restaurar_estudiante"),
+    path("restaurar-carpeta/<int:codcarpeta>/",views.restaurar_carpeta,name="restaurar_carpeta"),
     
 ]
