@@ -1,0 +1,45 @@
+[
+    {
+        "nombre": "Informacion Estudiantes",
+        "url": "index",
+        "icono": "bi-people"
+    },
+    {
+        "nombre": "Estudiantes",
+        "icono": "bi-mortarboard",
+        "submenu": [
+            {
+                "nombre": "Buscar Estudiantes",
+                "url": "buscar",
+                "icono": "bi-search"
+            },
+            {
+                "nombre": "Registrar Estudiantes",
+                "url": "registro",
+                "icono": "bi-person-plus"
+            }
+        ]
+    },
+    {
+        "nombre": "Carpetas",
+        "icono": "bi-folder",
+        "submenu": [
+            {
+                "nombre": "Buscar Carpetas",
+                "url": "consultar",
+                "icono": "bi-search"
+            },
+            {
+                "nombre": "Registrar Carpetas",
+                "url": "carpeta",
+                "icono": "bi-folder-plus"
+            }
+        ]
+    },
+    {
+        "nombre": "Cerrar Sesion",
+        "url": "logout",
+        "icono": "bi-box-arrow-right",
+        "tipo": "logout"
+    }
+]

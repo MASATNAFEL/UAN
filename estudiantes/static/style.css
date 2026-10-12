@@ -758,6 +758,202 @@ body:has(.menu-lateral:hover) .contenido-principal {
     position: relative;
     z-index: 1040;
 }
+.results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.results-header h2 {
+    margin-bottom: 6px;
+}
+
+.results-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* Contenedor adaptable de la tabla */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+/* Tabla */
+.custom-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+    background: #fff;
+}
+
+/* Encabezados */
+.custom-table thead th {
+    padding: 14px 16px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Celdas */
+.custom-table tbody td {
+    padding: 13px 16px;
+    color: #475569;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #edf2f7;
+    transition: background-color 0.18s ease;
+}
+
+/* Eliminar el borde de la última fila */
+.custom-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Resaltar la fila al pasar el cursor */
+.custom-table tbody tr {
+    transition: background-color 0.18s ease;
+}
+
+.custom-table tbody tr:hover td {
+    background-color: #f0f5ff;
+}
+
+/* Resaltar también con el teclado */
+.custom-table tbody tr:focus-within td {
+    background-color: #f0f5ff;
+}
+
+/* Columna de acciones */
+.custom-table .actions-column,
+.custom-table .actions-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.custom-table .actions-cell {
+    min-width: 145px;
+}
+
+/* Botón Ver detalles */
+.btn-details {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border: 1px solid #bfdbfe;
+    border-radius: 7px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.btn-details:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #fff;
+}
+
+.btn-details:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+/* Estado sin resultados */
+.search-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 36px 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+.search-empty i {
+    font-size: 1.8rem;
+    color: #94a3b8;
+}
+
+.search-empty p {
+    margin: 0;
+}
+/* Evitar que los datos deformen la tabla */
+.custom-table {
+    width: 100%;
+    table-layout: auto;
+}
+
+/* Mantener las celdas alineadas */
+.custom-table th,
+.custom-table td {
+    vertical-align: middle;
+}
+
+/* Permitir que los nombres largos ocupen varias líneas */
+.custom-table tbody td {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+/* Mantener cédulas y códigos legibles */
+.custom-table tbody td:nth-child(2) {
+    overflow-wrap: anywhere;
+}
+
+/* Evitar que la columna de acciones se deforme */
+.custom-table th:last-child,
+.custom-table td:last-child {
+    min-width: 135px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* En pantallas pequeñas, conservar la estructura de la tabla */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .custom-table {
+        min-width: 650px;
+    }
+
+    .custom-table thead th,
+    .custom-table tbody td {
+        padding: 11px 12px;
+    }
+
+    .results-header {
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .custom-table tbody tr,
+    .custom-table tbody td,
+    .btn-details {
+        transition: none;
+    }
+}
+
 @media (max-width: 480px) {
     .login-container {
         min-height: 70vh;
