@@ -462,3 +462,113 @@
     .search-form .filter-actions .btn {
         width: 100%;
     }}
+
+    
+/* Menú lateral contraído */
+.menu-lateral {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    width: 70px;
+    background-color: #212529;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 1030;
+
+    transition: width 0.25s ease;
+}
+
+/* Expandir al acercar el cursor */
+.menu-lateral:hover,
+.menu-lateral:focus-within {
+    width: 260px;
+}
+
+/* Lista principal */
+.menu-opciones,
+.menu-lateral .submenu {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+}
+
+/* Enlaces y botones */
+.menu-enlace {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 48px;
+    padding: 12px 24px;
+    color: #dee2e6;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* Efecto al pasar el cursor */
+.menu-enlace:hover {
+    background-color: #343a40;
+    color: #fff;
+}
+
+/* Iconos */
+.menu-enlace > .bi:first-child {
+    min-width: 22px;
+    font-size: 1.2rem;
+}
+
+/* Ocultar los nombres cuando está contraído */
+.menu-texto,
+.menu-enlace .flecha {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+/* Mostrar los nombres cuando se expande */
+.menu-lateral:hover .menu-texto,
+.menu-lateral:hover .flecha,
+.menu-lateral:focus-within .menu-texto,
+.menu-lateral:focus-within .flecha {
+    opacity: 1;
+}
+
+/* Sangría de los submenús */
+.menu-lateral .submenu .menu-enlace {
+    padding-left: 34px;
+    font-size: 0.92rem;
+}
+
+/* Botón de cerrar sesión */
+.menu-lateral form {
+    margin: 0;
+}
+
+.menu-lateral button.menu-enlace {
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 0;
+}
+/* Espacio para el menú contraído */
+.contenido-principal {
+    margin-left: 85px;
+    margin-right: 15px;
+    transition: margin-left 0.25s ease;
+}
+
+/* Desplazar el contenido al expandir */
+body:has(.menu-lateral:hover) .contenido-principal {
+    margin-left: 275px;
+}
+
+/* En móviles, no desplazar demasiado el contenido */
+@media (max-width: 576px) {
+    .contenido-principal {
+        margin-left: 80px;
+    }
+
+    body:has(.menu-lateral:hover) .contenido-principal {
+        margin-left: 80px;
+    }
+}
