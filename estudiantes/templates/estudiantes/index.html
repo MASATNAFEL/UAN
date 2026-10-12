@@ -1,59 +1,94 @@
 {% extends "estudiantes/home.html" %}
+{% load static %}
+
 {% block title %}Panel de estudiantes - SGEIUAN{% endblock %}
-{% block content %} 
-<div class="panel-container"> 
-    <div class="panel-header">
-        <h2 id="listado-title">Listado Estudiantes</h2>
-    </div>
-    <div class="table-responsive">    
-        {% if lista_Estudiantes %}
-            <table class="custom-table">
-                <thead>       
-                    <th>Nombre Completo</th>
-                    <th>Identificación</th>
-                    <th style="text-align: right;">Acciones</th>
-                </thead>
-                <tbody>
-                {% for estudiante in lista_Estudiantes %}
-                    <tr>
-                        <td>
-                            <strong>{{estudiante.nombre}}</strong>
-                        </td>
-                        <td>
-                            <strong>{{estudiante.cedula_ciudadania}}</strong>
-                        </td>
-                        <td style="text-align: right;">
-                            <a href="{% url 'informacion' estudiante.cedula_ciudadania %}" class="student_link">Ver detalles -></a>
-                        </td>
-                    </tr>   
-                {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-        <div class="empty-state">
-            <p style="font-size: 1.1rem;margin-bottom: 0.5rem;">no hay estudiantes registrados en la base de datos.</p>
-            <small>usa el botón inferior para añadir uno nuevo</small>
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
+
+            <!-- Tarjeta principal -->
+            <div class="card shadow-sm border-0 rounded-3">
+
+                <!-- Cabecera -->
+                <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h2 id="listado-title" class="h4 mb-0">
+                        <i class="bi bi-people me-2"></i>
+                        Listado de estudiantes
+                    </h2>
+
+                    <span class="badge bg-light text-dark">
+                        Panel de estudiantes
+                    </span>
+                </div>
+
+                <!-- Contenido -->
+                <div class="card-body p-4">
+
+                    {% if lista_Estudiantes %}
+
+                        <!-- Tabla de estudiantes -->
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Nombre completo</th>
+                                            <th scope="col">Identificación</th>
+                                            <th scope="col" class="text-end">Acciones</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for estudiante in lista_Estudiantes %}
+                                            <tr>
+                                                <td>
+                                                    <strong>{{ estudiante.nombre }}</strong>
+                                                </td>
+
+                                                <td>
+                                                    {{ estudiante.cedula_ciudadania }}
+                                                </td>
+
+                                                <td class="text-end">
+                                                    <a
+                                                        href="{% url 'informacion' estudiante.cedula_ciudadania %}"
+                                                        class="btn btn-info"
+                                                    >
+                                                        <i class="bi bi-eye me-1"></i>
+                                                        Ver detalles
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    {% else %}
+
+                        <!-- Estado vacío -->
+                        <div class="search-empty">
+                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+
+                            <p class="fw-semibold mb-2">
+                                No hay estudiantes registrados
+                            </p>
+
+                            <small>
+                                Cuando registres estudiantes, aparecerán en este listado.
+                            </small>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
         </div>
-        {% endif %}
-    </div>
-</div>
-        <!-- Barra de navegación inferior entre módulos -->
-    <div class="actions-bar">
-        <a href="{% url 'buscar' %}" class="btn-nav">
-            🔍 Buscar estudiante
-        </a>
-        <a href="{% url 'consultar' %}" class="btn-nav">
-            🔍 Buscar carpeta
-        </a>
-        <a href="{% url 'registro' %}" class="btn-nav">
-            ➕ Registrar estudiante
-        </a>
-        <a href="{% url 'carpeta' %}" class="btn-nav">
-            ➕ Registrar carpeta
-        </a>
-        <a href="{% url 'logout' %}" class="btn-nav">
-             Cerrar Sesión
-        </a>
     </div>
 </div>
 {% endblock %}
+

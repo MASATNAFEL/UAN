@@ -5,24 +5,36 @@
         "icono": "bi-people"
     },
     {
-        "nombre": "Buscar Estudiantes",
-        "url": "buscar",
-        "icono": "bi-search"
+        "nombre": "Estudiantes",
+        "icono": "bi-mortarboard",
+        "submenu": [
+            {
+                "nombre": "Buscar Estudiantes",
+                "url": "buscar",
+                "icono": "bi-search"
+            },
+            {
+                "nombre": "Registrar Estudiantes",
+                "url": "registro",
+                "icono": "bi-person-plus"
+            }
+        ]
     },
     {
-        "nombre": "Registro Estudiantes",
-        "url": "registro",
-        "icono": "bi-person-plus"
-    },
-     {
-        "nombre": "Buscar Carpetas",
-        "url": "consultar",
-        "icono": "bi-search"
-    },
-    {
-        "nombre": "Registro Carpetas",
-        "url": "carpeta",
-        "icono": "bi-person-plus"
+        "nombre": "Carpetas",
+        "icono": "bi-folder",
+        "submenu": [
+            {
+                "nombre": "Buscar Carpetas",
+                "url": "consultar",
+                "icono": "bi-search"
+            },
+            {
+                "nombre": "Registrar Carpetas",
+                "url": "carpeta",
+                "icono": "bi-folder-plus"
+            }
+        ]
     },
     {
         "nombre": "Cerrar Sesion",

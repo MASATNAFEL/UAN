@@ -1,10 +1,51 @@
 {% extends "estudiantes/home.html" %}
 {% load static %}
+
 {% block title %}Registro - SGEIUAN{% endblock %}
+
 {% block content %}
-	<form method="POST">
-	     {% csrf_token %}
-             {{ form.as_p}}
-             <button type="submit">Guardar</button>
-	</form>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+
+            <!-- Tarjeta de registro -->
+            <div class="card shadow-sm border-0 rounded-3">
+
+                <!-- Cabecera -->
+                <div class="card-header bg-dark text-white py-3">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Registro de usuario
+                    </h2>
+                </div>
+
+                <!-- Formulario -->
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+
+                        <hr class="my-4">
+
+                        <!-- Acciones -->
+                        <div class="d-flex justify-content-between flex-wrap gap-2">
+                            <a href="javascript:history.back()"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Volver
+                            </a>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-person-check me-1"></i>
+                                Registrar usuario
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

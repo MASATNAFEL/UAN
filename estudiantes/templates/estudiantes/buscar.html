@@ -97,7 +97,9 @@
                                     <td>{{ dato }}</td>
                                 {% endfor %}
                                  <td>
-                                <a href="{% url 'informacion' fila.0 %}" class="student_link">Ver detalles -></a>
+                                <a href="{% url 'informacion' fila.0 %}"  class="btn btn-info">
+                                    <i class="bi bi-eye me-1"></i>
+                                    Ver detalles</a>
                                 </td>
                             </tr>
                            
