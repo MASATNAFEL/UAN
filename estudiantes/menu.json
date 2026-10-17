@@ -11,12 +11,14 @@
             {
                 "nombre": "Buscar Estudiantes",
                 "url": "buscar",
-                "icono": "bi-search"
+                "icono": "bi-search",
+                "permisos": "gestion.view_estudiante"
             },
             {
                 "nombre": "Registrar Estudiantes",
                 "url": "registro",
-                "icono": "bi-person-plus"
+                "icono": "bi-person-plus",
+                "permisos": "gestion.add_estudiante"
             }
         ]
     },
@@ -27,12 +29,14 @@
             {
                 "nombre": "Buscar Carpetas",
                 "url": "consultar",
-                "icono": "bi-search"
+                "icono": "bi-search",
+                "permisos": "gestion.view_carpeta"
             },
             {
                 "nombre": "Registrar Carpetas",
                 "url": "carpeta",
-                "icono": "bi-folder-plus"
+                "icono": "bi-folder-plus",
+                "permisos": "gestion.add_carpeta"
             }
         ]
     },

@@ -31,10 +31,12 @@
   <div class="actions-container">
     <!--Volver-->
     <a href="{%url 'index' %}" class="btn btn-secondary">Regresar a inicio</a>
+    {% if perms.gestion.change_estudiante %}
     <!--Actualizar-->
     <a href="{%url url_editar listado.pk %}" class="btn btn-warning">Actualizar datos</a>
     <!--Eliminar (dispara el modal)-->
-      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</button>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</button>
+    {% endif %}
   </div>
   </div>
   </div>
