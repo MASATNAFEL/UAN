@@ -95,6 +95,18 @@
             {% endif %}
         </li>
         {% endfor %}
+        {% if request.user.is_superuser %}
+            <li class="menu-item">
+                <a class="menu-enlace"
+                href="{% url 'administrar_usuarios' %}">
+                    <i class="bi bi-people-fill"></i>
+                    <span class="menu-texto">
+                        Administrar usuarios
+                    </span>
+                </a>
+            </li>
+        {% endif %}
+
     </ul>
 </aside>
 {% endif %}
