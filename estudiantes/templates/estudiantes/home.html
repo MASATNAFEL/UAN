@@ -59,15 +59,29 @@
                 <ul class="submenu collapse"
                     id="submenu{{ forloop.counter }}">
                     {% for subitem in item.submenu %}
-                    <li>
-                        <a class="menu-enlace"
-                           href="{% url subitem.url %}">
-                            <i class="bi {{ subitem.icono }}"></i>
-                            <span class="menu-texto">
-                                {{ subitem.nombre }}
-                            </span>
-                        </a>
-                    </li>
+                        {% if subitem.url == "registro" or subitem.url == "carpeta" %}
+                            {% if request.user.groups.all.0.name != "Consulta" %}
+                                <li>
+                                    <a class="menu-enlace"
+                                    href="{% url subitem.url %}">
+                                        <i class="bi {{ subitem.icono }}"></i>
+                                        <span class="menu-texto">
+                                            {{ subitem.nombre }}
+                                        </span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li>
+                                <a class="menu-enlace"
+                                href="{% url subitem.url %}">
+                                    <i class="bi {{ subitem.icono }}"></i>
+                                    <span class="menu-texto">
+                                        {{ subitem.nombre }}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {% else %}

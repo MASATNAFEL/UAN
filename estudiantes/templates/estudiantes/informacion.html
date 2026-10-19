@@ -11,7 +11,7 @@
       {% for campo in listado.get_fields %}
         <div class="info-item">
           <div class="info-label">
-            {{ campo.verbose_name}}
+            {{ campo.labels }}
           </div>
           <div class="info-value">
             {% if campo.value is True %}
@@ -26,11 +26,24 @@
           </div>
         </div>
       {% endfor %}
+      <div class="info-item">
+          <div class="info-label">
+            {{msn}}
+          </div>
+          <div class="info-value">
+            {% if enlace %}
+              <a href="{% url url_enlace enlace %}">{{ enlace }}</a>
+            {% else %}
+              <em style="color: #626263;">No registra</em>
+            {% endif %}
+          </div>
+      </div>
+      
     </div>
 
   <div class="actions-container">
     <!--Volver-->
-    <a href="{%url 'index' %}" class="btn btn-secondary">Regresar a inicio</a>
+    <a href="javascript:history.back()" class="btn btn-secondary">Regresar</a>
     {% if perms.gestion.change_estudiante %}
     <!--Actualizar-->
     <a href="{%url url_editar listado.pk %}" class="btn btn-warning">Actualizar datos</a>

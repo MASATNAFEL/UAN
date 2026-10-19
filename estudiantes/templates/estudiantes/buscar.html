@@ -31,12 +31,12 @@
                     </div>
 
                     <div class="search-field">
-                        <label for="c">Cédula</label>
+                        <label for="c">Documento de identificacion</label>
                         <input
                             type="text"
                             name="c"
                             id="c"
-                            placeholder="Buscar por cédula..."
+                            placeholder="Buscar por No. de documento..."
                             value="{{ consulta_cedula }}"
                         >
                     </div>
@@ -47,8 +47,8 @@
                         <label for="codcarpeta">Código de carpeta</label>
                         <input
                             type="text"
-                            name="codcarpeta"
-                            id="codcarpeta"
+                            name="a"
+                            id="a"
                             placeholder="Buscar por código de carpeta..."
                             value="{{ consulta_codcarpeta }}"
                         >
@@ -63,14 +63,18 @@
                                 <i class="bi bi-arrow-left me-1"></i>
                                 Volver
                             </a>
-                {% if es_superusuario %}
-                    {% if ver_inactivos %}
-                        <a href="?">Ver registros activos</a>
-                    {% else %}
-                        <a href="?estado=inactivos">
-                            Ver registros desactivados
-                        </a>
-                    {% endif %}
+                {% if request.user.groups.all %}
+                    {% for grupo in request.user.groups.all %}
+                        {% if grupo.name == "Super" %}
+                            {% if ver_inactivos %}
+                                <a href="?" class="btn btn-secondary">Ver registros activos</a>
+                            {% else %}
+                                <a href="?estado=inactivos" class="btn btn-secondary">
+                                    Ver registros desactivados
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
                 {% endif %}
                 <button type="submit" class="btn btn-primary">
                     Buscar
@@ -100,31 +104,75 @@
 
                     <thead>
                         <tr>
+                            <th class="actions-column">Acciones</th>
                             {% for encabezado in encabezados %}
                                 <th>{{ encabezado }}</th>
                             {% endfor %}
-                            <th class="actions-column">Acciones</th>
+                            
                         </tr>
                     </thead>
 
                     <tbody>
                         {% for fila in datos %}
                             <tr>
-                                {% for dato in fila %}
-                                    <td>{{ dato|default_if_none:"—" }}</td>
-                                {% endfor %}
-
                                 <td class="actions-cell">
-                                    <a
-                                        href="{% url urls fila.0 %}"
-                                        class="btn btn-info"
-                                        title="Ver detalles del registro"
-                                        aria-label="Ver detalles del registro"
-                                    >
-                                        <i class="bi bi-eye" aria-hidden="true"></i>
-                                        <span>Ver detalles</span>
-                                    </a>
+                                    {% if request.user.groups.all.0.name != "Consulta" %}
+                                        {% if request.user.groups.all.0.name == "Super" and request.GET.estado == "inactivos" %}
+                                            {% if tipo == "buscar" %}
+                                           <form method="POST" action="{% url 'restaurar_estudiante' fila.0 %}">
+                                            {% elif tipo == "consultar" %}
+                                           <form method="POST" action="{% url 'restaurar_carpeta' fila.0 %}">
+                                            {% endif %}
+                                            {% csrf_token %}
+                                            <button
+                                                type="submit"
+                                                class="btn btn-info"
+                                                title="activar registro"
+                                                aria-label="activar registro">
+                                                <i class="bi bi-eye" aria-hidden="true"></i>
+                                                <span>Activar</span>
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                            <a
+                                            href="{% url urls fila.0 %}"
+                                            class="btn btn-info"
+                                            title="actualizar datos"
+                                            aria-label="actualizar datos"
+                                            >
+                                                <i class="bi bi-eye" aria-hidden="true"></i>
+                                                <span>actualizar</span>
+                                        </a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a
+                                        {% if tipo == "buscar" %}
+                                            href="{% url 'informacion' fila.0 %}"
+                                        {% elif tipo == "consultar" %}
+                                            href="{% url 'infocarpeta' fila.0 %}"
+                                        {% endif %}
+                                            
+                                            class="btn btn-info"
+                                            title="ver detalles"
+                                            aria-label="ver detalles"
+                                        >
+                                            <i class="bi bi-eye" aria-hidden="true"></i>
+                                            <span>ver detalles</span>
+                                        </a>
+                                    {% endif %}
                                 </td>
+                                {% for dato in fila %}
+                                    {% if dato is True %}
+                                    <td style="color: #08822a;font-weight: 600; text-align: center;">Sí</td>
+                                    {% elif dato is False %}
+                                    <td style="color: #700606;font-weight: 600; text-align: center;">No</td>
+                                    {% elif dato != None %}
+                                    <td style="text-align: center;">{{ dato }}</td>
+                                    {% else %}
+                                    <td style="text-align: center;">{{dato|default_if_none:"—" }}</td>
+                                    {% endif %}                                    
+                                {% endfor %}
+                                
                             </tr>
                         {% endfor %}
                     </tbody>

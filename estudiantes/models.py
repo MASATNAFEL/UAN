@@ -25,10 +25,19 @@ class Estudiante(models.Model):
 
 	def get_fields(self):
 		ocultar = ["fecha_registro", "fecha_actualizacion", "activo"]
+		labels={
+					  "cedula_ciudadania":"No. de documento",
+					   "nombre":"Nombre completo",
+					   "tipocc":"Tipo de documento",
+					   "rdoc":"Registro de documento",
+					   "contacto":"Teléfono",
+					   "email":"Correo electrónico"
+					   }
 		return [
             {
                 'name': field.name,
                 'verbose_name': field.verbose_name.title(),
+                "labels": labels.get(field.name, field.verbose_name.title()),
                 'value': getattr(self, field.name),
             }
             for field in self._meta.fields
@@ -50,7 +59,7 @@ class Carpeta(models.Model):
 	mat_sem = models.BooleanField(default=False)
 	rec_pago = models.BooleanField(default=False)
 	folio = models.IntegerField(default=0)
-	modelo = models.BooleanField(default=True)
+	modelo = models.CharField(default="presencial")
 	observa = models.TextField(blank=True, null=True)
 	activo = models.BooleanField(default=True) 
 	fecha_registro = models.DateTimeField(auto_now_add=True)
@@ -60,10 +69,22 @@ class Carpeta(models.Model):
     		return f"{self.codcarpeta}"
 	def get_fields(self):
 			ocultar = ["fecha_registro", "fecha_actualizacion", "activo"]
+			labels = {
+						  "codcarpeta":"Codigo de carpeta",
+						  "estudiante":"Estudiante",
+						  "year_start":"Año de inicio",
+						  "year_end":"Año de finalización",
+						  "notas":"Notas",
+						  "mat_sem":"Matrícula semestral",
+						  "rec_pago":"Recibo de pago",
+						  "folio":"Folio",
+						  "modelo":"Modalidad",
+						  "observa":"Observaciones"}
 			return [
 				{
 					'name': field.name,
 					'verbose_name': field.verbose_name.title(),
+					"labels": labels.get(field.name, field.verbose_name.title()),
 					'value': getattr(self, field.name),
 				}
 				for field in self._meta.fields

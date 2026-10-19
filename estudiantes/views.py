@@ -1,7 +1,8 @@
 from .models import Estudiante,Carpeta
-from .forms import FormularioEstudiante, FormularioCarpeta
+from .forms import FormularioEstudiante, FormularioCarpeta, FormularioCarpetae, FormularioEstudianta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
+from django.db import transaction
 from django.shortcuts import get_object_or_404,render,redirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
@@ -12,42 +13,43 @@ from django.http import HttpResponseForbidden
 @permission_required('estudiantes.view_carpeta', raise_exception=True)
 def index(request):
     lista_Estudiantes = Estudiante.objects.filter(activo=True).order_by("nombre")
-    lista_Carpetas = Carpeta.objects.order_by("codcarpeta")
-    context = {"lista_Estudiantes":lista_Estudiantes,"lista_Carpetas":lista_Carpetas}
+    context = {"lista_Estudiantes":lista_Estudiantes}
     return render(request,"estudiantes/index.html",context)
 @login_required
 @permission_required('estudiantes.view_estudiante', raise_exception=True)
 def informacion(request,cedula_ciudadania):
     listado=get_object_or_404(Estudiante,pk=cedula_ciudadania,activo=True)
-    return render(request,"estudiantes/informacion.html", {"listado":listado,"url_editar":"editar","url_borrar":"borrar"})
+    carpeta=Carpeta.objects.filter(estudiante=listado).first()
+    return render(request,"estudiantes/informacion.html", {"listado":listado,"url_editar":"editar","url_borrar":"borrar", "url_enlace":"infocarpeta","enlace":carpeta,"msn":"ver carpeta"})
 @login_required
 @permission_required('estudiantes.view_carpeta', raise_exception=True)
 def infocarpeta(request,codcarpeta):
     listado=get_object_or_404(Carpeta,pk=codcarpeta)
-    return render(request,"estudiantes/informacion.html", {"listado":listado,"url_editar":"modificar","url_borrar":"eliminar"})
+    estudiante=listado.estudiante.cedula_ciudadania
+    return render(request,"estudiantes/informacion.html", {"listado":listado,"url_editar":"modificar","url_borrar":"eliminar","url_enlace":"informacion","enlace":estudiante,"msn":"ver estudiante"})
 @login_required
 @permission_required('estudiantes.change_estudiante', raise_exception=True)
 def editar(request,cedula_ciudadania):
     estudiante = get_object_or_404(Estudiante, pk=cedula_ciudadania)
     if request.method =='POST' :
-        form = FormularioEstudiante(request.POST, instance=estudiante)
+        form = FormularioEstudianta(request.POST, instance=estudiante)
         if form.is_valid():
             form.save()
             return redirect('informacion',estudiante.pk)
     else:
-        form = FormularioEstudiante(instance=estudiante)
+        form = FormularioEstudianta(instance=estudiante)
     return render(request, 'estudiantes/editar.html', {'form': form,'estudiante':estudiante})
 @login_required
 @permission_required('estudiantes.change_carpeta', raise_exception=True)
 def modificar(request,codcarpeta):
     carpeta = get_object_or_404(Carpeta, pk=codcarpeta)
     if request.method =='POST' :
-        form = FormularioCarpeta(request.POST, instance=carpeta)
+        form = FormularioCarpetae(request.POST, instance=carpeta)
         if form.is_valid():
             form.save()
             return redirect('infocarpeta',carpeta.pk)
     else:
-        form = FormularioCarpeta(instance=carpeta)
+        form = FormularioCarpetae(instance=carpeta)
     return render(request, 'estudiantes/editar.html', {'form': form,'carpeta':carpeta})
 @login_required
 @permission_required('estudiantes.view_estudiante', raise_exception=True)
@@ -87,7 +89,7 @@ def buscar(request):
         "encabezados": encabezados,
         "datos": datos,
         "resultado": resultado,
-        "urls": "informacion",
+        "urls": "editar",
         "tipo": "buscar",
         "ver_inactivos": ver_inactivos,
         "es_superusuario": request.user.is_superuser,
@@ -123,7 +125,7 @@ def consultar(request):
         "encabezados": encabezados,
         "datos": datos,
         "resultado": resultado,
-        "urls": "infocarpeta",
+        "urls": "modificar",
         "tipo": "consultar",
         "ver_inactivos": ver_inactivos,
         "es_superusuario": request.user.is_superuser,
@@ -139,23 +141,29 @@ def consultar(request):
 def addestudiante(request):
     if request.method=="POST":
         form = FormularioEstudiante(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
+        form1 = FormularioCarpetae(request.POST)
+        if form.is_valid() and form1.is_valid():
+            with transaction.atomic():
+                estudiante = form.save()
+                carpeta=form1.save(commit=False)
+                carpeta.estudiante = estudiante
+                carpeta.save()
+                return redirect('index')
     else:
         form=FormularioEstudiante()
-    return render(request,"estudiantes/registro.html",{"form":form})
+        form1=FormularioCarpetae()
+    return render(request,"estudiantes/registro.html",{"form":form,"form1":form1})
 @login_required
 @permission_required('estudiantes.add_carpeta', raise_exception=True)
 def addcarpeta(request):
     if request.method=="POST":
-        form = FormularioCarpeta(request.POST)
-        if form.is_valid():
-            form.save()
+        form1 = FormularioCarpeta(request.POST)
+        if form1.is_valid():
+            form1.save()
             return redirect('index')
     else:
-        form=FormularioCarpeta()
-    return render(request,"estudiantes/registro.html",{"form":form})
+        form1=FormularioCarpeta()
+    return render(request,"estudiantes/registro.html",{"form1":form1})
 @login_required
 @permission_required('estudiantes.change_estudiante', raise_exception=True)
 @require_POST
@@ -248,11 +256,24 @@ def preparar_tabla(resultado):
     modelo = resultado.model
 
     campos = modelo._meta.fields
-
+    nombres_personalizados = {
+    "cedula_ciudadania": "No. de documento",
+    "nombre": "Nombre completo",
+    "tipocc": "Tipo de documento",
+    "rdoc":"registro documento",
+    "contacto": "Teléfono",
+    "email": "Correo electrónico",
+    "codcarpeta": "codigo Carpeta",
+    "year_start": "Año de inicio",
+    "year_end": "Año de finalización",
+    "mat_sem": "Matrícula semestre",
+    "rec_pago": "Recibo de pago",
+    "modelo": "Modalidad",
+    "observa": "Observaciones",}
     encabezados = [
-        campo.verbose_name
+        nombres_personalizados.get(campo.name, campo.verbose_name)
         for campo in campos
-            if campo .name not in ["activo", "fecha_registro", "fecha_actualizacion"]
+            if campo .name not in ["activo", "fecha_registro", "fecha_actualizacion"]      
     ]
 
     datos = [

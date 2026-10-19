@@ -41,6 +41,12 @@
         ]
     },
     {
+    "nombre": "Carga masiva de estudiantes",
+    "url": "carga_masiva",
+    "icono": "bi-file-earmark-excel",
+    "permiso": "importar_estudiantes"
+    },
+    {
         "nombre": "Cerrar Sesion",
         "url": "logout",
         "icono": "bi-box-arrow-right",
