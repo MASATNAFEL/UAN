@@ -1,0 +1,55 @@
+[
+    {
+        "nombre": "Informacion Estudiantes",
+        "url": "index",
+        "icono": "bi-people"
+    },
+    {
+        "nombre": "Estudiantes",
+        "icono": "bi-mortarboard",
+        "submenu": [
+            {
+                "nombre": "Buscar Estudiantes",
+                "url": "buscar",
+                "icono": "bi-search",
+                "permisos": "gestion.view_estudiante"
+            },
+            {
+                "nombre": "Registrar Estudiantes",
+                "url": "registro",
+                "icono": "bi-person-plus",
+                "permisos": "gestion.add_estudiante"
+            }
+        ]
+    },
+    {
+        "nombre": "Carpetas",
+        "icono": "bi-folder",
+        "submenu": [
+            {
+                "nombre": "Buscar Carpetas",
+                "url": "consultar",
+                "icono": "bi-search",
+                "permisos": "gestion.view_carpeta"
+            },
+            {
+                "nombre": "Registrar Carpetas",
+                "url": "carpeta",
+                "icono": "bi-folder-plus",
+                "permisos": "gestion.add_carpeta"
+            }
+        ]
+    },
+    {
+    "nombre": "Carga masiva de estudiantes",
+    "url": "index",
+    "icono": "bi-file-earmark-excel",
+    "permiso": "importar_estudiantes"
+    },
+    {
+        "nombre": "Cerrar Sesion",
+        "url": "logout",
+        "icono": "bi-box-arrow-right",
+        "tipo": "logout"
+    }
+]
