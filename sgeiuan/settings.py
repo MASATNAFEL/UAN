@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-4a*jvbxbjrzr9xmmj+0n2=0ix!2)j0&*=t3&k0464x6mivdexl
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["*",".onrender.com","localhost","127.0.0.1"]
+ALLOWED_HOSTS = ["*",".onrender.com","localhost","127.0.0.1","https://sistema-de-gesti-n-informaci-n-de.onrender.com"]
 
 
 # Application definition
@@ -129,7 +129,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'estudiantes/static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # (Opcional pero recomendado si usas una carpeta 'static' global además de la de las apps)
