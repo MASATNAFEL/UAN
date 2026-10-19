@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4a*jvbxbjrzr9xmmj+0n2=0ix!2)j0&*=t3&k0464x6mivdexl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 DEBUG = False
 
 ALLOWED_HOSTS = ["*",".onrender.com","localhost","127.0.0.1"]
@@ -117,7 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
 LANGUAGE_CODE = 'es-es'
 
 TIME_ZONE = 'America/Bogota'
@@ -130,8 +129,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'estudiantes/static/'
-STATIC_ROOT = BASE_DIR /"staticfiles"STATIC_URL = '/static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # (Opcional pero recomendado si usas una carpeta 'static' global además de la de las apps)
