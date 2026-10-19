@@ -129,7 +129,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'estudiantes/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # (Opcional pero recomendado si usas una carpeta 'static' global además de la de las apps)
