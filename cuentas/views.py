@@ -1,17 +1,16 @@
-from django.shortcuts import render,redirect
-from django.contrib.auth import authenticate,login,logout
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
-from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import render,redirect,get_object_or_404
+from django.contrib.auth import authenticate,login,logout,get_user_model
+from django.contrib.auth.models import Group, Permission
 from django.contrib import messages
-from .forms import CrearUsuarioForm
-from django.shortcuts import get_object_or_404
+from .forms import CrearUsuarioForm,EditarUsuarioForm
 from django.views.decorators.http import require_POST
-from .forms import EditarUsuarioForm
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 
 Usuario = get_user_model()
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('index')
     if request.method=="POST":
         username=request.POST.get("username")
         password=request.POST.get("password")
@@ -123,3 +122,35 @@ def cambiar_estado_usuario(request, usuario_id):
         )
 
     return redirect("administrar_usuarios")
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser) # Opcional: solo para superusuarios
+def administrar_grupos(request):
+    grupos = Group.objects.all()
+    return render(request, 'cuentas/administrar_grupos.html', {'grupos': grupos})
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def editar_permisos_grupo(request, grupo_id):
+    grupo = get_object_or_404(Group, pk=grupo_id)
+    
+    permisos_disponibles = Permission.objects.filter(content_type__app_label='estudiantes')
+
+    if request.method == 'POST':
+        permisos_ids = request.POST.getlist('permisos')
+        grupo.permissions.set(permisos_ids)
+        return redirect('administrar_grupos')
+
+    # Traducimos los nombres de los permisos al español para la interfaz
+    for permiso in permisos_disponibles:
+        nombre = permiso.name
+        nombre = nombre.replace('Can add', 'Puede agregar')
+        nombre = nombre.replace('Can change', 'Puede modificar')
+        nombre = nombre.replace('Can delete', 'Puede eliminar')
+        nombre = nombre.replace('Can view', 'Puede ver')
+        # Puedes añadir más reemplazos si tienes más palabras en inglés
+        permiso.nombre_traducido = nombre
+
+    return render(request, 'cuentas/editar_permisos_grupo.html', {
+        'grupo': grupo,
+        'permisos_disponibles': permisos_disponibles
+    })

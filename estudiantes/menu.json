@@ -12,13 +12,13 @@
                 "nombre": "Buscar Estudiantes",
                 "url": "buscar",
                 "icono": "bi-search",
-                "permisos": "gestion.view_estudiante"
+                "permisos": "estudiantes.view_estudiante"
             },
             {
                 "nombre": "Registrar Estudiantes",
                 "url": "registro",
                 "icono": "bi-person-plus",
-                "permisos": "gestion.add_estudiante"
+                "permisos": "estudiantes.add_estudiante"
             }
         ]
     },
@@ -30,13 +30,13 @@
                 "nombre": "Buscar Carpetas",
                 "url": "consultar",
                 "icono": "bi-search",
-                "permisos": "gestion.view_carpeta"
+                "permisos": "estudiantes.view_carpeta"
             },
             {
                 "nombre": "Registrar Carpetas",
                 "url": "carpeta",
                 "icono": "bi-folder-plus",
-                "permisos": "gestion.add_carpeta"
+                "permisos": "estudiantes.add_carpeta"
             }
         ]
     },
@@ -47,6 +47,18 @@
     "permiso": "importar_estudiantes",
     "tipo":"masivo"
     },
+    {
+        "nombre": "Gestion de usuarios",
+        "url": "administrar_usuarios",
+        "icono": "bi-person-gear",
+        "tipo": "admin_usuarios"
+        },
+    {
+        "nombre": "Administrar Grupos",
+        "url": "administrar_grupos",
+        "icono": "bi-shield-lock",
+        "tipo": "admin_grupos"
+        },
     {
         "nombre": "Cerrar Sesion",
         "url": "logout",

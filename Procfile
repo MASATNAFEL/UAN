@@ -1,0 +1,1 @@
+web: gunicorn sgeiuan.wsgi:application

@@ -35,12 +35,9 @@
             {% if item.tipo == "logout" %}
                 <form method="post" action="{% url item.url %}">
                     {% csrf_token %}
-                    <button type="submit"
-                            class="menu-enlace w-100 border-0">
+                    <button type="submit" class="menu-enlace w-100 border-0 bg-transparent text-start">
                         <i class="bi {{ item.icono }}"></i>
-                        <span class="menu-texto">
-                            {{ item.nombre }}
-                        </span>
+                        <span class="menu-texto">{{ item.nombre }}</span>
                     </button>
                 </form>
             {% elif item.submenu %}
@@ -51,66 +48,41 @@
                    aria-expanded="false"
                    aria-controls="submenu{{ forloop.counter }}">
                     <i class="bi {{ item.icono }}"></i>
-                    <span class="menu-texto">
-                        {{ item.nombre }}
-                    </span>
+                    <span class="menu-texto">{{ item.nombre }}</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </a>
-                <ul class="submenu collapse"
-                    id="submenu{{ forloop.counter }}">
+                <ul class="submenu collapse" id="submenu{{ forloop.counter }}">
                     {% for subitem in item.submenu %}
-                        {% if subitem.url == "registro" or subitem.url == "carpeta" %}
-                            {% if request.user.groups.all.0.name != "Consulta" %}
-                                <li>
-                                    <a class="menu-enlace"
-                                    href="{% url subitem.url %}">
-                                        <i class="bi {{ subitem.icono }}"></i>
-                                        <span class="menu-texto">
-                                            {{ subitem.nombre }}
-                                        </span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        {% else %}
-                            <li>
-                                <a class="menu-enlace"
-                                href="{% url subitem.url %}">
-                                    <i class="bi {{ subitem.icono }}"></i>
-                                    <span class="menu-texto">
-                                        {{ subitem.nombre }}
-                                    </span>
-                                </a>
-                            </li>
-                        {% endif %}
+                        <li>
+                            <a class="menu-enlace" href="{% url subitem.url %}">
+                                <i class="bi {{ subitem.icono }}"></i>
+                                <span class="menu-texto">{{ subitem.nombre }}</span>
+                            </a>
+                        </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <a class="menu-enlace"
-                   href="{% url item.url %}">
+                <a class="menu-enlace" href="{% url item.url %}">
                     <i class="bi {{ item.icono }}"></i>
-                    <span class="menu-texto">
-                        {{ item.nombre }}
-                    </span>
+                    <span class="menu-texto">{{ item.nombre }}</span>
                 </a>
             {% endif %}
         </li>
         {% endfor %}
-        {% if request.user.is_superuser %}
+
+        <!-- REGLA 2 APLICADA AQUÍ -->
+        {% if mostrar_admin %}
             <li class="menu-item">
-                <a class="menu-enlace"
-                href="{% url 'administrar_usuarios' %}">
+                <a class="menu-enlace" href="{% url 'administrar_usuarios' %}">
                     <i class="bi bi-people-fill"></i>
-                    <span class="menu-texto">
-                        Administrar usuarios
-                    </span>
+                    <span class="menu-texto">Administrar usuarios</span>
                 </a>
             </li>
         {% endif %}
-
     </ul>
 </aside>
 {% endif %}
-    <!-- Contenedor Principal Dinámico -->
+<!-- Contenedor Principal Dinámico -->
     <main class="container my-5 flex-grow-1 contenido-principal">
         {% block content %}
         {% endblock %}

@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import dj_database_url
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,15 +21,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4a*jvbxbjrzr9xmmj+0n2=0ix!2)j0&*=t3&k0464x6mivdexl'
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Lee la clave desde las variables de entorno, si no existe usa una por defecto para local
+load_dotenv(BASE_DIR / '.env')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
 DEBUG = False
 
-ALLOWED_HOSTS = ["*",".onrender.com","localhost","127.0.0.1","https://sistema-de-gesti-n-informaci-n-de.onrender.com"]
-
-
+ALLOWED_HOSTS = [
+    ".onrender.com",
+    "localhost",
+    "127.0.0.1",
+    "sistema-de-gesti-n-informaci-n-de.onrender.com"
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -94,8 +103,14 @@ DATABASES = {
     }
 }
 
-
-# Password validation
+# Si estamos en Render (o tenemos DATABASE_URL configurada), sobrescribimos con PostgreSQL
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=True,
+    )# Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -128,7 +143,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
-
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index' 
+LOGOUT_REDIRECT_URL = 'login'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
