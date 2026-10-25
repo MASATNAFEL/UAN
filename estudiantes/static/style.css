@@ -405,42 +405,38 @@ form p:has(input[type="checkbox"]) {
 /* Contenedor principal */
 
 .login-container {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box;
     width: 100%;
     min-height: 75vh;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
     padding: 40px 20px;
+    box-sizing: border-box;
 }
-
-/* Tarjeta */
 
 .login-container .login-card {
     display: block;
     width: 100%;
     max-width: 430px;
     margin: 0 auto !important;
-    overflow: hidden;
+    background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
-    background: #fff;
     box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
+    overflow: hidden;
 }
-
-/* Cabecera */
 
 .login-container .login-header {
     display: block;
     padding: 28px 24px;
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    color: #fff;
     text-align: center;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
 }
 
 .login-container .login-header h1 {
     margin: 0 0 10px;
-    color: #fff;
+    color: #ffffff;
     font-size: 26px;
 }
 
@@ -449,8 +445,6 @@ form p:has(input[type="checkbox"]) {
     color: #cbd5e1;
     font-size: 14px;
 }
-
-/* Cuerpo y formulario */
 
 .login-container .login-body {
     padding: 28px;
@@ -478,14 +472,12 @@ form p:has(input[type="checkbox"]) {
     font-weight: 700;
 }
 
-/* Campos */
-
 .login-container .login-field input {
     display: block;
-    box-sizing: border-box;
     width: 100%;
     min-height: 44px;
     padding: 10px 12px;
+    box-sizing: border-box;
     border: 1px solid #cbd5e1;
     border-radius: 7px;
     background: #f8fafc;
@@ -496,11 +488,9 @@ form p:has(input[type="checkbox"]) {
 .login-container .login-field input:focus {
     outline: none;
     border-color: #0284c7;
-    background: #fff;
+    background: #ffffff;
     box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
 }
-
-/* Botón */
 
 .login-container .login-button {
     display: block;
@@ -511,7 +501,7 @@ form p:has(input[type="checkbox"]) {
     border: none;
     border-radius: 7px;
     background: #0284c7;
-    color: #fff;
+    color: #ffffff;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
@@ -520,8 +510,6 @@ form p:has(input[type="checkbox"]) {
 .login-container .login-button:hover {
     background: #0369a1;
 }
-
-/* Mensajes de error */
 
 .login-container .login-error {
     margin-bottom: 20px;
@@ -532,7 +520,16 @@ form p:has(input[type="checkbox"]) {
     color: #b91c1c;
 }
 
+@media (max-width: 480px) {
+    .login-container {
+        min-height: 70vh;
+        padding: 24px 16px;
+    }
 
+    .login-container .login-body {
+        padding: 22px;
+    }
+}
 /* ==========================================================================
    9. FORMULARIO DE BÚSQUEDA
    ========================================================================== */
