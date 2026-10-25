@@ -1,5 +1,5 @@
 from .models import Estudiante,Carpeta
-from .forms import FormularioEstudiante, FormularioCarpeta, FormularioCarpetae, FormularioEstudianta
+from .forms import FormularioEstudiante, FormularioCarpeta, FormularioCarpetae,FormularioCarpetb, FormularioEstudianta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.db import transaction
@@ -141,7 +141,7 @@ def consultar(request):
 def addestudiante(request):
     if request.method=="POST":
         form = FormularioEstudiante(request.POST)
-        form1 = FormularioCarpetae(request.POST)
+        form1 = FormularioCarpetb(request.POST)
         if form.is_valid() and form1.is_valid():
             with transaction.atomic():
                 estudiante = form.save()

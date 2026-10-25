@@ -372,7 +372,7 @@ form p:has(input[type="checkbox"]) {
 /* Iconos e imágenes */
 
 #icono {
-    height: 10vh;
+    height: 6vh;
     width: auto;
     margin-right: 8px;
 }
