@@ -25,6 +25,21 @@ def normalizar_encabezado(valor):
     texto = re.sub(r"[^a-z0-9]+", "_", texto)
     return texto.strip("_")
 
+def normalizar_cedula(valor):
+    """
+    Limpia y normaliza el valor de la cédula, eliminando espacios
+    y el sufijo .0 que Excel añade a veces a los números enteros.
+    """
+    if valor is None:
+        return ""
+    
+    cedula = str(valor).strip()
+    
+    if cedula.endswith(".0"):
+        cedula = cedula[:-2]
+        
+    return cedula.strip()
+
 def convertir_booleano(valor):
     """
     Convierte los valores Sí/No del Excel a booleanos de Python.
@@ -43,6 +58,26 @@ def convertir_booleano(valor):
         return False
 
     raise ValueError(f"Valor booleano no reconocido: {valor}")
+
+def normalizar_anio(valor):
+    """
+    Limpia y normaliza el año, eliminando periodos como '-1', '-2'
+    y el sufijo '.0' que Excel suele agregar (ej: '2026-1' -> '2026').
+    """
+    if valor is None:
+        return ""
+    
+    texto = str(valor).strip()
+    
+    # Quitar el .0 de Excel si lo tiene
+    if texto.endswith(".0"):
+        texto = texto[:-2]
+        
+    # Si viene con un guion (ej: 2026-1), nos quedamos solo con la parte del año
+    if "-" in texto:
+        texto = texto.split("-")[0].strip()
+        
+    return texto
 
 def convertir_entero(valor, campo, fila, obligatorio=False):
     """Convierte números de Excel a enteros sin aceptar decimales."""
@@ -69,10 +104,7 @@ def convertir_entero(valor, campo, fila, obligatorio=False):
     return numero
 
 def leer_excel(ruta_archivo):
-    """
-    Lee la primera hoja del Excel y devuelve sus filas como diccionarios.
-    La primera fila debe contener los encabezados.
-    """
+    """Lee la primera hoja del Excel y mapea estrictamente los encabezados."""
     libro = load_workbook(
         filename=ruta_archivo,
         read_only=True,
@@ -87,62 +119,88 @@ def leer_excel(ruta_archivo):
             libro.close()
             raise ValueError("El archivo Excel está vacío.")
 
-        encabezados = [
+        encabezados_normalizados = [
             normalizar_encabezado(valor)
             for valor in encabezados
         ]
 
         alias = {
             "no": "numero",
+            "numero": "numero",
             "codigo_que_reposa_en_la_carpeta": "codcarpeta",
+            "cod_carpeta": "codcarpeta",
+            "codigo_carpeta": "codcarpeta",
             "programa": "programa",
             "nombre_del_estudiante": "nombre",
+            "nombre": "nombre",
             "documento_tarjeta_de_indentidad_o_cedula_de_ciudadania": "tipocc",
+            "tipocc": "tipocc",
+            "tipo_documento": "tipocc",
             "numero_de_identificacion": "cedula_ciudadania",
+            "cedula": "cedula_ciudadania",
+            "cedula_ciudadania": "cedula_ciudadania",
+            "telefono": "contacto",
+            "celular": "contacto",
+            "contacto": "contacto",
+            "correo": "email",
+            "correo_electronico": "email",
+            "email": "email",
             "indique_si_en_la_carpeta_reposa_fotocopia_de_cedula_tarjeta_de_identidad": "rdoc",
+            "rdoc": "rdoc",
+            "fotocopia_cedula": "rdoc",
             "ano_de_ingreso_en_la_universidad": "year_start",
+            "ano_ingreso": "year_start",
+            "year_start": "year_start",
             "ano_en_que_dejo_de_estudiar": "year_end",
+            "ano_fin": "year_end",
+            "year_end": "year_end",
             "indique_si_en_la_carpeta_reposa_sabana_de_notas_o_reporte_de_notas": "notas",
+            "notas": "notas",
+            "sabana_notas": "notas",
             "indique_si_en_la_carpeta_reposa_guias_de_matricula_de_los_periodos_cursados": "mat_sem",
+            "mat_sem": "mat_sem",
+            "guias_matricula": "mat_sem",
             "indique_si_en_la_carpeta_reposa_recibos_de_pago_de_los_periodos_cursados": "rec_pago",
+            "rec_pago": "rec_pago",
+            "recibos_pago": "rec_pago",
             "numero_de_folios_que_reposan_en_la_carpeta": "folio",
+            "folio": "folio",
+            "folios": "folio",
             "observaciones": "observa",
+            "observa": "observa",
+            "modelo": "modelo",
         }
 
-        encabezados = [
-            alias.get(encabezado, encabezado)
-            for encabezado in encabezados
+        encabezados_mapeados = [
+            alias.get(encabezado) for encabezado in encabezados_normalizados
         ]
 
-        if len(encabezados) != len(set(encabezados)):
-            raise ValueError(
-                "Hay columnas duplicadas después de normalizar "
-                "los encabezados del Excel."
-            )
         registros = []
 
         for numero_fila, valores in enumerate(filas, start=2):
             if all(valor is None for valor in valores):
                 continue
 
-            registro = {
-                encabezado: valor
-                for encabezado, valor in zip(encabezados, valores)
-                if encabezado
-            }
+            registro = {}
+            for campo_interno, valor in zip(encabezados_mapeados, valores):
+                if campo_interno:
+                    registro[campo_interno] = valor
+
             registro["_fila_excel"] = numero_fila
+
             telefono = registro.get("contacto")
             correo = registro.get("email")
+
             registro["contacto"] = (
                 str(telefono).strip()
                 if telefono is not None and str(telefono).strip()
                 else TELEFONO_PREDETERMINADO
-                )
+            )
             registro["email"] = (
                 str(correo).strip()
                 if correo is not None and str(correo).strip()
                 else CORREO_PREDETERMINADO
-                )
+            )
             
             registros.append(registro)
         return registros
@@ -172,7 +230,6 @@ def generar_codigo_carpeta(cedula):
 
         contador += 1
 
-
 def guardar_conflictos_json(conflictos, ruta_archivo):
     """Guarda los conflictos para revisarlos posteriormente."""
     ruta = Path(ruta_archivo)
@@ -186,6 +243,7 @@ def guardar_conflictos_json(conflictos, ruta_archivo):
             indent=4,
             default=str,
         )
+
 def validar_registros(registros):
     validos = []
     errores = []
@@ -212,7 +270,6 @@ def validar_registros(registros):
             valor = registro.get(campo)
 
             if valor is None or not str(valor).strip():
-                # El código de carpeta puede generarse automáticamente.
                 if campo == "codcarpeta":
                     continue
 
@@ -220,24 +277,15 @@ def validar_registros(registros):
                     f"El campo '{campo}' es obligatorio."
                 )
 
-        # Validar cédula
-        cedula = registro.get("cedula_ciudadania")
+        # Validar cédula usando la función auxiliar
+        cedula = normalizar_cedula(registro.get("cedula_ciudadania"))
 
-        if cedula is not None:
-            cedula = str(cedula).strip()
+        if cedula and (not cedula.isdigit() or len(cedula) > 15):
+            errores_fila.append(
+                "La cédula debe ser numérica y tener máximo 15 dígitos."
+            )
 
-            if cedula.endswith(".0"):
-                cedula = cedula[:-2]
-
-            if cedula and (
-                not cedula.isdigit() or len(cedula) > 15
-            ):
-                errores_fila.append(
-                    "La cédula debe ser numérica y tener "
-                    "máximo 15 dígitos."
-                )
-
-        # Validar años
+        # Validar años usando normalizar_anio
         anios = {}
 
         for campo in ["year_start", "year_end"]:
@@ -250,7 +298,7 @@ def validar_registros(registros):
                     )
                 continue
 
-            texto = str(valor).strip()
+            texto = normalizar_anio(valor)
 
             try:
                 numero = float(texto)
@@ -265,7 +313,11 @@ def validar_registros(registros):
                 ):
                     raise ValueError
 
-                anios[campo] = str(anio)
+                anio_str = str(anio)
+                anios[campo] = anio_str
+                
+                # Actualizar el registro con el año limpio
+                registro[campo] = anio_str
 
             except (ValueError, TypeError):
                 errores_fila.append(
@@ -281,6 +333,7 @@ def validar_registros(registros):
                 "El año de finalización no puede ser anterior "
                 "al año de inicio."
             )
+
         # Validar número de folios
         folios = registro.get("folio")
 
@@ -325,13 +378,7 @@ def revisar_conflictos(registros_validos):
     for registro in registros_validos:
         fila = registro.get("_fila_excel", "?")
 
-        cedula = str(
-            registro.get("cedula_ciudadania") or ""
-        ).strip()
-
-        if cedula.endswith(".0"):
-            cedula = cedula[:-2]
-
+        cedula = normalizar_cedula(registro.get("cedula_ciudadania"))
         anio = str(registro.get("year_start")).strip()
 
         # 1. Detectar la misma cédula y año en el Excel
@@ -410,13 +457,13 @@ def revisar_conflictos(registros_validos):
             })
 
     return conflictos
+
 def importar_excel(ruta_excel, ruta_conflictos):
     registros = leer_excel(ruta_excel)
 
     validos, errores_validacion = validar_registros(registros)
     conflictos = list(errores_validacion)
 
-    # Revisar conflictos antes de modificar la base de datos.
     conflictos.extend(revisar_conflictos(validos))
 
     filas_con_conflictos = {
@@ -438,14 +485,8 @@ def importar_excel(ruta_excel, ruta_conflictos):
             for registro in registros_importables:
                 fila = registro["_fila_excel"]
 
-                cedula = str(
-                    registro["cedula_ciudadania"]
-                ).strip()
+                cedula = normalizar_cedula(registro.get("cedula_ciudadania"))
 
-                if cedula.endswith(".0"):
-                    cedula = cedula[:-2]
-
-                # Obtener o crear el estudiante.
                 estudiante = Estudiante.objects.filter(
                     pk=cedula
                 ).first()
@@ -526,8 +567,6 @@ def importar_excel(ruta_excel, ruta_conflictos):
             "mensaje": str(exc),
         })
 
-        # Si falla la transacción, no se consideran
-        # confirmados los registros creados.
         estudiantes_creados = 0
         carpetas_creadas = 0
 

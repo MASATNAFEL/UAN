@@ -1,12 +1,12 @@
 {% extends "estudiantes/home.html" %}
 {% load static %}
-{% block title %}carga masivos - SGEIUAN{% endblock %}
+{% block title %}Carga Masiva - SGEIUAN{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2>Subir archivo Excel</h2>
 
-    <form method="POST"
-          enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
         <div class="mb-3">
@@ -35,6 +35,76 @@
                 {{ message }}
             </div>
         {% endfor %}
+    {% endif %}
+
+    <!-- SECCIÓN DE ERRORES Y CONFLICTOS (Aparece dinámicamente al procesar) -->
+    {% if resultado %}
+        <div class="card mt-4 shadow-sm {% if resultado.conflictos > 0 %}border-danger{% else %}border-success{% endif %}">
+            <div class="card-header {% if resultado.conflictos > 0 %}bg-danger text-white{% else %}bg-success text-white{% endif %}">
+                <h5 class="mb-0">
+                    {% if resultado.conflictos > 0 %}
+                        <i class="fas fa-exclamation-triangle"></i> Conflictos Detectados ({{ resultado.conflictos }})
+                    {% else %}
+                        <i class="fas fa-check-circle"></i> Importación Exitosa
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Resumen rápido -->
+                <p class="mb-3">
+                    <strong>Total leídos:</strong> {{ resultado.total_leidos }} | 
+                    <strong>Válidos:</strong> {{ resultado.total_validos }} | 
+                    <strong>Estudiantes creados:</strong> {{ resultado.estudiantes_creados }} | 
+                    <strong>Carpeta(s) creada(s):</strong> {{ resultado.carpetas_creadas }}
+                </p>
+
+                <!-- Si hay conflictos, mostramos la tabla detallada -->
+                {% if resultado.detalle_conflictos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" style="width: 15%;">Fila Excel</th>
+                                    <th scope="col" style="width: 30%;">Tipo</th>
+                                    <th scope="col">Detalle / Mensaje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in resultado.detalle_conflictos %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            Fila {{ item.fila_excel|default:"General" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger text-wrap">
+                                            {{ item.tipo }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if item.mensajes %}
+                                            <ul class="mb-0 ps-3">
+                                                {% for msg in item.mensajes %}
+                                                    <li>{{ msg }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            {{ item.mensaje }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success mb-0" role="alert">
+                        ¡Todos los registros del archivo se importaron de forma limpia y sin errores!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
     {% endif %}
 </div>
 {% endblock %}
