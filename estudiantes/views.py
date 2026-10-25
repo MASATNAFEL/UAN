@@ -151,7 +151,7 @@ def addestudiante(request):
                 return redirect('index')
     else:
         form=FormularioEstudiante()
-        form1=FormularioCarpetae()
+        form1=FormularioCarpetb()
     return render(request,"estudiantes/registro.html",{"form":form,"form1":form1})
 @login_required
 @permission_required('estudiantes.add_carpeta', raise_exception=True)
