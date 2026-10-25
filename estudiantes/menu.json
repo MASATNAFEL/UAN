@@ -42,10 +42,9 @@
     },
     {
     "nombre": "Carga masiva de estudiantes",
-    "url": "subirarchivo",
+    "url": "carga_masiva",
     "icono": "bi-file-earmark-excel",
-    "permiso": "importar_estudiantes",
-    "tipo":"masivo"
+    "permiso": "importar_estudiantes"
     },
     {
         "nombre": "Gestion de usuarios",
