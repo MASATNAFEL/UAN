@@ -1,4 +1,3 @@
-import json
 import re
 from datetime import date
 from pathlib import Path
@@ -36,18 +35,14 @@ def normalizar_cedula(valor):
     
     cedula = str(valor).strip()
     
-    # Quitar el .0 de Excel si lo tiene al final
     if cedula.endswith(".0"):
         cedula = cedula[:-2]
         
-    # Eliminar guiones, espacios y cualquier carácter que no sea un número
     cedula = re.sub(r"[^0-9]", "", cedula)
-    
     return cedula
+
 def convertir_booleano(valor):
-    """
-    Convierte los valores Sí/No del Excel a booleanos de Python.
-    """
+    """Convierte los valores Sí/No del Excel a booleanos de Python."""
     if valor is None or str(valor).strip() == "":
         return False
     if isinstance(valor, bool):
@@ -62,11 +57,9 @@ def convertir_booleano(valor):
         return False
 
     raise ValueError(f"Valor booleano no reconocido: {valor}")
+
 def generar_consecutivo_codigo(codigo_base):
-    """
-    Genera un código de carpeta consecutivo si el código base ya existe en la BD.
-    Ej: Si 5001 ya existe, genera 50011, 50012, etc.
-    """
+    """Genera un código de carpeta consecutivo si el código base ya existe en la BD."""
     try:
         base = int(codigo_base)
     except (ValueError, TypeError):
@@ -78,21 +71,16 @@ def generar_consecutivo_codigo(codigo_base):
         if not Carpeta.objects.filter(pk=nuevo_codigo).exists():
             return nuevo_codigo
         contador += 1
+
 def normalizar_anio(valor):
-    """
-    Limpia y normaliza el año, eliminando periodos como '-1', '-2'
-    y el sufijo '.0' que Excel suele agregar (ej: '2026-1' -> '2026').
-    """
+    """Limpia y normaliza el año, eliminando periodos y sufijos."""
     if valor is None:
         return ""
     
     texto = str(valor).strip()
-    
-    # Quitar el .0 de Excel si lo tiene
     if texto.endswith(".0"):
         texto = texto[:-2]
         
-    # Si viene con un guion (ej: 2026-1), nos quedamos solo con la parte del año
     if "-" in texto:
         texto = texto.split("-")[0].strip()
         
@@ -102,9 +90,7 @@ def convertir_entero(valor, campo, fila, obligatorio=False):
     """Convierte números de Excel a enteros sin aceptar decimales."""
     if valor is None or str(valor).strip() == "":
         if obligatorio:
-            raise ValueError(
-                f"Falta el campo obligatorio '{campo}'."
-            )
+            raise ValueError(f"Falta el campo obligatorio '{campo}'.")
         return None
 
     try:
@@ -116,9 +102,7 @@ def convertir_entero(valor, campo, fila, obligatorio=False):
                 raise ValueError
             numero = int(numero_decimal)
         except (ValueError, TypeError):
-            raise ValueError(
-                f"Fila {fila}: '{campo}' debe ser un número entero."
-            )
+            raise ValueError(f"Fila {fila}: '{campo}' debe ser un número entero.")
 
     return numero
 
@@ -227,10 +211,7 @@ def leer_excel(ruta_archivo):
         libro.close()
 
 def generar_codigo_carpeta(cedula):
-    """
-    Usa la cédula como código base.
-    Si está ocupada, agrega un contador hasta hallar uno libre.
-    """
+    """Usa la cédula como código base."""
     try:
         base = int(cedula)
     except (ValueError, TypeError):
@@ -240,33 +221,48 @@ def generar_codigo_carpeta(cedula):
         )
 
     contador = 0
-
     while True:
         codigo = base if contador == 0 else int(f"{base}{contador}")
-
         if not Carpeta.objects.filter(pk=codigo).exists():
             return codigo
-
         contador += 1
 
-def guardar_conflictos_json(conflictos, ruta_archivo):
-    """Guarda los conflictos para revisarlos posteriormente."""
-    ruta = Path(ruta_archivo)
-    ruta.parent.mkdir(parents=True, exist_ok=True)
+def guardar_reporte_errores_excel(conflictos, ruta_excel_original, ruta_salida_excel):
+    """Genera un archivo Excel con los errores y conflictos detallados por fila."""
+    errores_por_fila = {}
+    
+    for conflicto in conflictos:
+        fila = conflicto.get("fila_excel")
+        if fila:
+            if fila not in errores_por_fila:
+                errores_por_fila[fila] = []
+            
+            if "mensajes" in conflicto:
+                errores_por_fila[fila].extend(conflicto["mensajes"])
+            elif "mensaje" in conflicto:
+                errores_por_fila[fila].append(conflicto["mensaje"])
 
-    with ruta.open("w", encoding="utf-8") as archivo:
-        json.dump(
-            conflictos,
-            archivo,
-            ensure_ascii=False,
-            indent=4,
-            default=str,
-        )
+    # Abrir el libro original para editarlo sin el modo read_only
+    libro_original = load_workbook(filename=ruta_excel_original)
+    hoja_original = libro_original.active
+    
+    # Agregar la columna de errores al final
+    max_col = hoja_original.max_column
+    hoja_original.cell(row=1, column=max_col + 1, value="Errores / Conflictos")
+    
+    for num_fila in range(2, hoja_original.max_row + 1):
+        if num_fila in errores_por_fila:
+            texto_errores = " | ".join(errores_por_fila[num_fila])
+            hoja_original.cell(row=num_fila, column=max_col + 1, value=texto_errores)
+
+    ruta = Path(ruta_salida_excel)
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+    libro_original.save(ruta)
+    libro_original.close()
 
 def validar_registros(registros):
     validos = []
     errores = []
-
     anio_actual = date.today().year
 
     obligatorios = [
@@ -284,99 +280,57 @@ def validar_registros(registros):
         fila = registro.get("_fila_excel", "?")
         errores_fila = []
 
-        # Campos obligatorios
         for campo in obligatorios:
             valor = registro.get(campo)
-
             if valor is None or not str(valor).strip():
                 if campo == "codcarpeta":
                     continue
+                errores_fila.append(f"El campo '{campo}' es obligatorio.")
 
-                errores_fila.append(
-                    f"El campo '{campo}' es obligatorio."
-                )
-
-        # Validar cédula usando la función auxiliar
         cedula = normalizar_cedula(registro.get("cedula_ciudadania"))
-
         if cedula and (not cedula.isdigit() or len(cedula) > 15):
-            errores_fila.append(
-                "La cédula debe ser numérica y tener máximo 15 dígitos."
-            )
+            errores_fila.append("La cédula debe ser numérica y tener máximo 15 dígitos.")
 
-        # Validar años usando normalizar_anio
         anios = {}
-
         for campo in ["year_start", "year_end"]:
             valor = registro.get(campo)
-
             if valor is None or not str(valor).strip():
                 if campo == "year_start":
-                    errores_fila.append(
-                        "El año de inicio es obligatorio."
-                    )
+                    errores_fila.append("El año de inicio es obligatorio.")
                 continue
 
             texto = normalizar_anio(valor)
-
             try:
                 numero = float(texto)
-
                 if not numero.is_integer():
                     raise ValueError
-
                 anio = int(numero)
-
-                if len(str(anio)) != 4 or not (
-                    1900 <= anio <= anio_actual
-                ):
+                if len(str(anio)) != 4 or not (1900 <= anio <= anio_actual):
                     raise ValueError
 
                 anio_str = str(anio)
                 anios[campo] = anio_str
-                
-                # Actualizar el registro con el año limpio
                 registro[campo] = anio_str
-
             except (ValueError, TypeError):
-                errores_fila.append(
-                    f"'{campo}' debe ser un año válido de cuatro dígitos."
-                )
+                errores_fila.append(f"'{campo}' debe ser un año válido de cuatro dígitos.")
 
-        if (
-            "year_start" in anios
-            and "year_end" in anios
-            and anios["year_end"] < anios["year_start"]
-        ):
-            errores_fila.append(
-                "El año de finalización no puede ser anterior "
-                "al año de inicio."
-            )
+        if "year_start" in anios and "year_end" in anios and anios["year_end"] < anios["year_start"]:
+            errores_fila.append("El año de finalización no puede ser anterior al año de inicio.")
 
-        # Validar número de folios
         folios = registro.get("folio")
-
         if folios is not None and str(folios).strip():
             try:
                 numero = float(str(folios).strip())
-
                 if not numero.is_integer() or numero < 0:
                     raise ValueError
-
             except (ValueError, TypeError):
-                errores_fila.append(
-                    "El número de folios debe ser un "
-                    "entero no negativo."
-                )
+                errores_fila.append("El número de folios debe ser un entero no negativo.")
 
-        # Validar Sí/No
         for campo in campos_booleanos:
             try:
                 convertir_booleano(registro.get(campo))
             except ValueError as exc:
-                errores_fila.append(
-                    f"Campo '{campo}': {exc}"
-                )
+                errores_fila.append(f"Campo '{campo}': {exc}")
 
         if errores_fila:
             errores.append({
@@ -396,37 +350,24 @@ def revisar_conflictos(registros_validos):
 
     for registro in registros_validos:
         fila = registro.get("_fila_excel", "?")
-
         cedula = normalizar_cedula(registro.get("cedula_ciudadania"))
         anio = str(registro.get("year_start")).strip()
         programa_excel = str(registro.get("programa", "")).strip().casefold()
 
-        # 1. Detectar la misma cédula y año en el Excel
         clave = (cedula, anio)
-
         if clave in cedulas_anio_excel:
             conflictos.append({
                 "fila_excel": fila,
                 "tipo": "duplicado_en_excel",
-                "mensaje": (
-                    "La cédula y el año de ingreso "
-                    "ya aparecen en otra fila del archivo."
-                ),
+                "mensaje": "La cédula y el año de ingreso ya aparecen en otra fila del archivo.",
             })
         else:
             cedulas_anio_excel.add(clave)
 
-        # 2. Detectar códigos repetidos dentro del Excel
         codigo_valor = registro.get("codcarpeta")
-
         if codigo_valor is not None and str(codigo_valor).strip():
             try:
-                codigo = convertir_entero(
-                    codigo_valor,
-                    "codcarpeta",
-                    fila,
-                    obligatorio=True,
-                )
+                codigo = convertir_entero(codigo_valor, "codcarpeta", fila, obligatorio=True)
             except ValueError as exc:
                 conflictos.append({
                     "fila_excel": fila,
@@ -439,38 +380,28 @@ def revisar_conflictos(registros_validos):
                 conflictos.append({
                     "fila_excel": fila,
                     "tipo": "codigo_repetido_en_excel",
-                    "mensaje": (
-                        f"El código de carpeta {codigo} "
-                        "está repetido en el archivo."
-                    ),
+                    "mensaje": f"El código de carpeta {codigo} está repetido en el archivo.",
                 })
             else:
                 codigos_excel.add(codigo)
 
-            # 3. Comprobar si el código ya existe en la BD
             carpeta_existente = Carpeta.objects.filter(pk=codigo).first()
             if carpeta_existente:
                 anio_existente = str(carpeta_existente.year_start).strip()
-                # Obtenemos el programa del estudiante asociado a esa carpeta existente
                 programa_existente = str(carpeta_existente.estudiante.programa).strip().casefold()
 
-                # Comparamos si el año y el programa son exactamente iguales
                 if anio_existente == anio and programa_existente == programa_excel:
                     conflictos.append({
                         "fila_excel": fila,
                         "tipo": "carpeta_existente",
-                        "mensaje": (
-                            f"El código de carpeta {codigo} ya existe en la base de datos "
-                            f"para el mismo año ({anio}) y programa."
-                        ),
+                        "mensaje": f"El código de carpeta {codigo} ya existe en la base de datos para el mismo año ({anio}) y programa.",
                     })
                 else:
-                    # El código existe pero el año o la carrera son diferentes -> Se permite (creará consecutivo)
                     registro["_usar_consecutivo"] = True
 
     return conflictos
 
-def importar_excel(ruta_excel, ruta_conflictos):
+def importar_excel(ruta_excel, ruta_reporte_salida):
     registros = leer_excel(ruta_excel)
 
     validos, errores_validacion = validar_registros(registros)
@@ -496,60 +427,37 @@ def importar_excel(ruta_excel, ruta_conflictos):
         with transaction.atomic():
             for registro in registros_importables:
                 fila = registro["_fila_excel"]
-
                 cedula = normalizar_cedula(registro.get("cedula_ciudadania"))
 
-                estudiante = Estudiante.objects.filter(
-                    pk=cedula
-                ).first()
+                estudiante = Estudiante.objects.filter(pk=cedula).first()
 
                 if estudiante is None:
                     estudiante = Estudiante.objects.create(
                         cedula_ciudadania=cedula,
                         nombre=str(registro["nombre"]).strip(),
                         tipocc=str(registro["tipocc"]).strip(),
-                        rdoc=convertir_booleano(
-                            registro.get("rdoc")
-                        ),
+                        rdoc=convertir_booleano(registro.get("rdoc")),
                         programa=str(registro["programa"]).strip(),
                         contacto=registro["contacto"],
                         email=registro["email"],
                     )
                     estudiantes_creados += 1
 
-                year_start = str(
-                    registro["year_start"]
-                ).strip()
-
+                year_start = str(registro["year_start"]).strip()
                 codigo_excel = registro.get("codcarpeta")
 
-                if (
-                    codigo_excel is None
-                    or not str(codigo_excel).strip()
-                ):
+                if codigo_excel is None or not str(codigo_excel).strip():
                     codigo = generar_codigo_carpeta(cedula)
                 else:
-                    codigo = convertir_entero(
-                        codigo_excel,
-                        "codcarpeta",
-                        fila,
-                        obligatorio=True,
-                    )
-                    # Si se marcó porque el código original ya existe pero con año/programa diferente
+                    codigo = convertir_entero(codigo_excel, "codcarpeta", fila, obligatorio=True)
                     if registro.get("_usar_consecutivo"):
                         codigo = generar_consecutivo_codigo(codigo)
 
                 year_end = registro.get("year_end")
-
                 if year_end is not None:
                     year_end = str(year_end).strip() or None
 
-                folio = convertir_entero(
-                    registro.get("folio"),
-                    "folio",
-                    fila,
-                )
-
+                folio = convertir_entero(registro.get("folio"), "folio", fila)
                 if folio is None:
                     folio = 0
 
@@ -558,19 +466,11 @@ def importar_excel(ruta_excel, ruta_conflictos):
                     estudiante=estudiante,
                     year_start=year_start,
                     year_end=year_end,
-                    notas=convertir_booleano(
-                        registro.get("notas")
-                    ),
-                    mat_sem=convertir_booleano(
-                        registro.get("mat_sem")
-                    ),
-                    rec_pago=convertir_booleano(
-                        registro.get("rec_pago")
-                    ),
+                    notas=convertir_booleano(registro.get("notas")),
+                    mat_sem=convertir_booleano(registro.get("mat_sem")),
+                    rec_pago=convertir_booleano(registro.get("rec_pago")),
                     folio=folio,
-                    modelo=str(
-                        registro.get("modelo") or "presencial"
-                    ).strip(),
+                    modelo=str(registro.get("modelo") or "presencial").strip(),
                     observa=registro.get("observa"),
                 )
 
@@ -581,140 +481,15 @@ def importar_excel(ruta_excel, ruta_conflictos):
             "tipo": "error_importacion",
             "mensaje": str(exc),
         })
-
         estudiantes_creados = 0
         carpetas_creadas = 0
 
     finally:
-        guardar_conflictos_json(
+        # Ahora generamos un Excel con el reporte de errores
+        guardar_reporte_errores_excel(
             conflictos,
-            ruta_conflictos,
-        )
-
-    return {
-        "total_leidos": len(registros),
-        "total_validos": len(validos),
-        "errores_validacion": len(errores_validacion),
-        "estudiantes_creados": estudiantes_creados,
-        "carpetas_creadas": carpetas_creadas,
-        "conflictos": len(conflictos),
-        "detalle_conflictos": conflictos,
-    }
-    registros = leer_excel(ruta_excel)
-
-    validos, errores_validacion = validar_registros(registros)
-    conflictos = list(errores_validacion)
-
-    conflictos.extend(revisar_conflictos(validos))
-
-    filas_con_conflictos = {
-        conflicto["fila_excel"]
-        for conflicto in conflictos
-    }
-
-    registros_importables = [
-        registro
-        for registro in validos
-        if registro["_fila_excel"] not in filas_con_conflictos
-    ]
-
-    estudiantes_creados = 0
-    carpetas_creadas = 0
-
-    try:
-        with transaction.atomic():
-            for registro in registros_importables:
-                fila = registro["_fila_excel"]
-
-                cedula = normalizar_cedula(registro.get("cedula_ciudadania"))
-
-                estudiante = Estudiante.objects.filter(
-                    pk=cedula
-                ).first()
-
-                if estudiante is None:
-                    estudiante = Estudiante.objects.create(
-                        cedula_ciudadania=cedula,
-                        nombre=str(registro["nombre"]).strip(),
-                        tipocc=str(registro["tipocc"]).strip(),
-                        rdoc=convertir_booleano(
-                            registro.get("rdoc")
-                        ),
-                        programa=str(registro["programa"]).strip(),
-                        contacto=registro["contacto"],
-                        email=registro["email"],
-                    )
-                    estudiantes_creados += 1
-
-                year_start = str(
-                    registro["year_start"]
-                ).strip()
-
-                codigo_excel = registro.get("codcarpeta")
-
-                if (
-                    codigo_excel is None
-                    or not str(codigo_excel).strip()
-                ):
-                    codigo = generar_codigo_carpeta(cedula)
-                else:
-                    codigo = convertir_entero(
-                        codigo_excel,
-                        "codcarpeta",
-                        fila,
-                        obligatorio=True,
-                    )
-
-                year_end = registro.get("year_end")
-
-                if year_end is not None:
-                    year_end = str(year_end).strip() or None
-
-                folio = convertir_entero(
-                    registro.get("folio"),
-                    "folio",
-                    fila,
-                )
-
-                if folio is None:
-                    folio = 0
-
-                Carpeta.objects.create(
-                    codcarpeta=codigo,
-                    estudiante=estudiante,
-                    year_start=year_start,
-                    year_end=year_end,
-                    notas=convertir_booleano(
-                        registro.get("notas")
-                    ),
-                    mat_sem=convertir_booleano(
-                        registro.get("mat_sem")
-                    ),
-                    rec_pago=convertir_booleano(
-                        registro.get("rec_pago")
-                    ),
-                    folio=folio,
-                    modelo=str(
-                        registro.get("modelo") or "presencial"
-                    ).strip(),
-                    observa=registro.get("observa"),
-                )
-
-                carpetas_creadas += 1
-
-    except Exception as exc:
-        conflictos.append({
-            "tipo": "error_importacion",
-            "mensaje": str(exc),
-        })
-
-        estudiantes_creados = 0
-        carpetas_creadas = 0
-
-    finally:
-        guardar_conflictos_json(
-            conflictos,
-            ruta_conflictos,
+            ruta_excel,
+            ruta_reporte_salida,
         )
 
     return {

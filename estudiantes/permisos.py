@@ -1,45 +1,29 @@
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User, Group
 
-from estudiantes.models import Estudiante, Carpeta
+# 1. Asegurar que los grupos existan
+grupo_super, _ = Group.objects.get_or_create(name="Super")
+grupo_medio, _ = Group.objects.get_or_create(name="Medio")
+grupo_consulta, _ = Group.objects.get_or_create(name="Consulta")
 
+# 2. Al superusuario existente "Administrador" solo le asignamos el grupo Super (sin tocar su contraseña)
+try:
+    admin_user = User.objects.get(username='Administrador')
+    admin_user.groups.add(grupo_super)
+    print("Grupo 'Super' asignado al superusuario 'Administrador'.")
+except User.DoesNotExist:
+    print("El usuario 'Administrador' no existe.")
 
-def crear_roles():
-    content_type = ContentType.objects.get_for_model(Estudiante)
+# 3. Crear o actualizar el usuario: admin (Grupo Medio, clave: prueba)
+admin_medio, created = User.objects.get_or_create(username='admin')
+admin_medio.set_password('prueba')
+admin_medio.is_staff = True  # Para que pueda entrar al panel de administración si lo requiere
+admin_medio.save()
+admin_medio.groups.set([grupo_medio])
+print(f"Usuario 'admin' {'creado' if created else 'actualizado'} en grupo 'Medio'.")
 
-    # Obtener los permisos del modelo Estudiante
-    permisos = Permission.objects.filter(
-        content_type=content_type
-    )
-
-    permisos_por_nombre = {
-        permiso.codename: permiso
-        for permiso in permisos
-    }
-
-    # Crear los grupos
-    administrador, creado = Group.objects.get_or_create(
-            name="Super"
-        )
-    
-    moderador, creado = Group.objects.get_or_create(
-        name="Medio"
-    )
-    consultor, creado = Group.objects.get_or_create(
-        name="Consulta"
-    )
-    for modelo in [Estudiante, Carpeta]:
-        content_type = ContentType.objects.get_for_model(modelo)
-        permisos = Permission.objects.filter(content_type=content_type)
-        permisos_por_nombre = {permiso.codename: permiso for permiso in permisos}
-    
-    # Moderador: puede hacer todas las operaciones
-    moderador.permissions.add(*permisos.filter(codename__in=[
-        f"view_{modelo._meta.model_name}",
-        f"add_{modelo._meta.model_name}",
-        f"change_{modelo._meta.model_name}",
-    ]))
-
-
-    # Consultor: solamente puede visualizar
-    consultor.permissions.add(*permisos.filter(codename=f"view_{modelo._meta.model_name}"))
+# 4. Crear o actualizar el usuario: modprueba (Grupo Consulta, clave: prueba)
+user_consulta, created = User.objects.get_or_create(username='modprueba')
+user_consulta.set_password('prueba')
+user_consulta.save()
+user_consulta.groups.set([grupo_consulta])
+print(f"Usuario 'modprueba' {'creado' if created else 'actualizado'} en grupo 'Consulta'.")
