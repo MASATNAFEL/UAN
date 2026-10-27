@@ -1,3 +1,5 @@
+import csv
+import json
 import re
 from datetime import date
 from pathlib import Path
@@ -73,7 +75,7 @@ def generar_consecutivo_codigo(codigo_base):
         contador += 1
 
 def normalizar_anio(valor):
-    """Limpia y normaliza el año, eliminando periodos y sufijos."""
+    """Limpia y normaliza el año."""
     if valor is None:
         return ""
     
@@ -227,38 +229,50 @@ def generar_codigo_carpeta(cedula):
             return codigo
         contador += 1
 
-def guardar_reporte_errores_excel(conflictos, ruta_excel_original, ruta_salida_excel):
-    """Genera un archivo Excel con los errores y conflictos detallados por fila."""
-    errores_por_fila = {}
-    
-    for conflicto in conflictos:
-        fila = conflicto.get("fila_excel")
-        if fila:
-            if fila not in errores_por_fila:
-                errores_por_fila[fila] = []
-            
-            if "mensajes" in conflicto:
-                errores_por_fila[fila].extend(conflicto["mensajes"])
-            elif "mensaje" in conflicto:
-                errores_por_fila[fila].append(conflicto["mensaje"])
-
-    # Abrir el libro original para editarlo sin el modo read_only
-    libro_original = load_workbook(filename=ruta_excel_original)
-    hoja_original = libro_original.active
-    
-    # Agregar la columna de errores al final
-    max_col = hoja_original.max_column
-    hoja_original.cell(row=1, column=max_col + 1, value="Errores / Conflictos")
-    
-    for num_fila in range(2, hoja_original.max_row + 1):
-        if num_fila in errores_por_fila:
-            texto_errores = " | ".join(errores_por_fila[num_fila])
-            hoja_original.cell(row=num_fila, column=max_col + 1, value=texto_errores)
-
-    ruta = Path(ruta_salida_excel)
+def guardar_conflictos_json(conflictos, ruta_archivo):
+    """Guarda los conflictos en formato JSON (opcional interno)."""
+    ruta = Path(ruta_archivo)
     ruta.parent.mkdir(parents=True, exist_ok=True)
-    libro_original.save(ruta)
-    libro_original.close()
+
+    with ruta.open("w", encoding="utf-8") as archivo:
+        json.dump(
+            conflictos,
+            archivo,
+            ensure_ascii=False,
+            indent=4,
+            default=str,
+        )
+
+def guardar_reporte_errores_csv(conflictos, ruta_salida_csv):
+    """
+    Toma la lista de conflictos y genera un archivo CSV limpio y estructurado
+    con los errores encontrados, compatible con Excel (separado por punto y coma).
+    """
+    ruta = Path(ruta_salida_csv)
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+
+    # utf-8-sig permite abrir tildes y Ñ en Excel sin problemas de codificación
+    with ruta.open("w", encoding="utf-8-sig", newline="") as archivo_csv:
+        writer = csv.writer(archivo_csv, delimiter=";")
+        
+        # Escribir la cabecera
+        writer.writerow(["Fila Excel", "Tipo de Conflicto / Error", "Detalle del Mensaje"])
+
+        for conflicto in conflictos:
+            fila = conflicto.get("fila_excel", "General")
+            tipo = conflicto.get("tipo", "desconocido")
+            
+            mensajes = []
+            if "mensajes" in conflicto:
+                mensajes.extend(conflicto["mensajes"])
+            elif "mensaje" in conflicto:
+                mensajes.append(conflicto["mensaje"])
+            
+            texto_mensaje = " | ".join(mensajes) if mensajes else "Sin detalles"
+            
+            writer.writerow([fila, tipo, texto_mensaje])
+
+    print(f"Reporte CSV de errores guardado en: {ruta_salida_csv}")
 
 def validar_registros(registros):
     validos = []
@@ -423,12 +437,11 @@ def importar_excel(ruta_excel, ruta_reporte_salida):
     estudiantes_creados = 0
     carpetas_creadas = 0
 
-    try:
-        with transaction.atomic():
-            for registro in registros_importables:
-                fila = registro["_fila_excel"]
+    for registro in registros_importables:
+        fila = registro["_fila_excel"]
+        try:
+            with transaction.atomic():
                 cedula = normalizar_cedula(registro.get("cedula_ciudadania"))
-
                 estudiante = Estudiante.objects.filter(pk=cedula).first()
 
                 if estudiante is None:
@@ -476,21 +489,23 @@ def importar_excel(ruta_excel, ruta_reporte_salida):
 
                 carpetas_creadas += 1
 
-    except Exception as exc:
-        conflictos.append({
-            "tipo": "error_importacion",
-            "mensaje": str(exc),
-        })
-        estudiantes_creados = 0
-        carpetas_creadas = 0
+        except Exception as row_exc:
+            conflictos.append({
+                "fila_excel": fila,
+                "tipo": "error_base_datos",
+                "mensaje": f"Error al guardar: {str(row_exc)}",
+            })
 
-    finally:
-        # Ahora generamos un Excel con el reporte de errores
-        guardar_reporte_errores_excel(
-            conflictos,
-            ruta_excel,
-            ruta_reporte_salida,
-        )
+    # Guardar reporte de errores en CSV
+    try:
+        guardar_reporte_errores_csv(conflictos, ruta_reporte_salida)
+        
+        # Opcional: si también quieres conservar el JSON con la misma ruta cambiando la extensión:
+        # ruta_json = Path(ruta_reporte_salida).with_suffix(".json")
+        # guardar_conflictos_json(conflictos, ruta_json)
+        
+    except Exception as exc:
+        print(f"Error generando archivos de reporte: {exc}")
 
     return {
         "total_leidos": len(registros),
