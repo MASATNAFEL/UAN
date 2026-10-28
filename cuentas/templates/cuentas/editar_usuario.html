@@ -1,4 +1,3 @@
-
 {% extends "estudiantes/home.html" %}
 {% load static %}
 
@@ -15,99 +14,148 @@
                 <div class="card-header bg-primary text-white py-3">
                     <h4 class="mb-0">
                         <i class="bi bi-person-gear me-2"></i>
-                        Editar usuario
+                        Editar usuario: <strong>{{ usuario.username }}</strong>
                     </h4>
                 </div>
 
                 <div class="card-body p-4">
 
-                    <p class="text-muted">
-                        Modifica la información y los grupos de
-                        <strong>{{ usuario.username }}</strong>.
-                    </p>
+                    <!-- PESTAÑAS DE NAVEGACIÓN -->
+                    <ul class="nav nav-tabs mb-4" id="userTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-semibold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab" aria-controls="info-pane" aria-selected="true">
+                                <i class="bi bi-person-lines-fill me-1"></i> Información General
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-danger" id="security-tab" data-bs-toggle="tab" data-bs-target="#security-pane" type="button" role="tab" aria-controls="security-pane" aria-selected="false">
+                                <i class="bi bi-shield-lock me-1"></i> Seguridad y Acciones
+                            </button>
+                        </li>
+                    </ul>
 
-                    <form method="post">
-                        {% csrf_token %}
+                    <!-- CONTENIDO DE LAS PESTAÑAS -->
+                    <div class="tab-content" id="userTabContent">
 
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {{ form.non_field_errors }}
-                            </div>
-                        {% endif %}
+                        <!-- PESTAÑA 1: INFORMACIÓN GENERAL -->
+                        <div class="tab-pane fade show active" id="info-pane" role="tabpanel" aria-labelledby="info-tab">
+                            <form method="post">
+                                {% csrf_token %}
 
-                        <div class="row g-3">
-
-                            {% for field in form %}
-                                {% if field.name == "groups" %}
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">
-                                            {{ field.label }}
-                                        </label>
-
-                                        <div class="border rounded p-3">
-                                            {% for checkbox in field %}
-                                                <div class="form-check mb-2">
-                                                    {{ checkbox.tag }}
-                                                    <label
-                                                        class="form-check-label"
-                                                        for="{{ checkbox.id_for_label }}">
-                                                        {{ checkbox.choice_label }}
-                                                    </label>
-                                                </div>
-                                            {% empty %}
-                                                <p class="text-muted mb-0">
-                                                    No hay grupos disponibles.
-                                                </p>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-
-                                {% elif field.name == "is_active" %}
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
-                                            {{ field }}
-                                            <label
-                                                class="form-check-label"
-                                                for="{{ field.id_for_label }}">
-                                                {{ field.label }}
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                {% else %}
-                                    <div class="col-md-6">
-                                        <label
-                                            class="form-label fw-semibold"
-                                            for="{{ field.id_for_label }}">
-                                            {{ field.label }}
-                                        </label>
-
-                                        {{ field }}
+                                {% if form.non_field_errors %}
+                                    <div class="alert alert-danger">
+                                        {{ form.non_field_errors }}
                                     </div>
                                 {% endif %}
 
-                                {% for error in field.errors %}
-                                    <div class="col-12 text-danger small">
-                                        {{ error }}
+                                <div class="row g-3">
+                                    {% for field in form %}
+                                        {% if field.name == "groups" %}
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">
+                                                    {{ field.label }}
+                                                </label>
+                                                <div class="border rounded p-3 bg-light">
+                                                    {% for checkbox in field %}
+                                                        <div class="form-check mb-2">
+                                                            {{ checkbox.tag }}
+                                                            <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                                                                {{ checkbox.choice_label }}
+                                                            </label>
+                                                        </div>
+                                                    {% empty %}
+                                                        <p class="text-muted mb-0">No hay grupos disponibles.</p>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+
+                                        {% elif field.name == "is_active" %}
+                                            <div class="col-12 mt-4">
+                                                <div class="form-check form-switch">
+                                                    {{ field }}
+                                                    <label class="form-check-label fw-semibold" for="{{ field.id_for_label }}">
+                                                        {{ field.label }}
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                        {% else %}
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold" for="{{ field.id_for_label }}">
+                                                    {{ field.label }}
+                                                </label>
+                                                {{ field }}
+                                            </div>
+                                        {% endif %}
+
+                                        {% for error in field.errors %}
+                                            <div class="col-12 text-danger small">
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+
+                                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                    <a href="{% url 'administrar_usuarios' %}" class="btn btn-outline-secondary">
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save me-1"></i> Guardar cambios
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- PESTAÑA 2: SEGURIDAD Y ACCIONES -->
+                        <div class="tab-pane fade" id="security-pane" role="tabpanel" aria-labelledby="security-tab">
+                            
+                            <!-- Subsección: Cambiar Contraseña -->
+                            <div class="mb-5">
+                                <h5 class="text-dark fw-bold mb-3">
+                                    <i class="bi bi-key text-warning me-2"></i> Cambiar Contraseña
+                                </h5>
+                                <p class="text-muted small">Actualiza la credencial de acceso para este usuario de forma directa.</p>
+                                
+                                <div class="card bg-light border-0 p-4">
+                                    <form method="post" action="{% url 'cambiar_password_usuario' usuario.id %}">
+                                        {% csrf_token %}
+                                        {{ password_form.as_p }}
+                                        <div class="text-end mt-3">
+                                            <button type="submit" class="btn btn-warning text-dark fw-semibold">
+                                                <i class="bi bi-check-circle me-1"></i> Actualizar contraseña
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Subsección: Zona de Peligro (Eliminar) -->
+                            {% if not usuario.is_superuser %}
+                            <div class="pt-4 border-top">
+                                <h5 class="text-danger fw-bold mb-2">
+                                    <i class="bi bi-exclamation-triangle me-2"></i> Zona de Peligro
+                                </h5>
+                                <p class="text-muted small">Eliminar este usuario borrará permanentemente su acceso al sistema.</p>
+
+                                <div class="card border-danger bg-white p-3 d-flex flex-row justify-content-between align-items-center">
+                                    <div>
+                                        <span class="fw-semibold text-dark">¿Eliminar cuenta permanentemente?</span>
                                     </div>
-                                {% endfor %}
-                            {% endfor %}
+                                    <form action="{% url 'eliminar_usuario' usuario.id %}" method="POST" 
+                                          onsubmit="return confirm('¿Estás totalmente seguro de eliminar al usuario {{ usuario.username }}? Esta acción no se puede deshacer.');">
+                                    {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash me-1"></i> Eliminar usuario
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endif %}
 
                         </div>
 
-                        <div class="d-flex justify-content-end gap-2 mt-4">
-                            <a href="{% url 'administrar_usuarios' %}"
-                               class="btn btn-outline-secondary">
-                                Cancelar
-                            </a>
-
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save me-1"></i>
-                                Guardar cambios
-                            </button>
-                        </div>
-
-                    </form>
+                    </div>
 
                 </div>
             </div>

@@ -6,9 +6,9 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Subir archivo Excel</h2>
-        <!-- Botón para descargar la plantilla -->
+        <!-- Botón para descargar la plantilla corregido con las clases correctas de FontAwesome -->
         <a href="{% url 'descargar_plantilla_excel' %}" class="btn btn-outline-success">
-            <i class="fas file-excel"></i> Descargar Plantilla Excel
+            <i class="fas fa-file-excel"></i> Descargar Plantilla Excel
         </a>
     </div>
 
@@ -40,7 +40,7 @@
         {% endfor %}
     {% endif %}
 
-    <!-- SECCIÓN DE RESULTados Y CONFLICTOS -->
+    <!-- SECCIÓN DE RESULTADOS Y CONFLICTOS -->
     {% if resultado %}
         <div class="card mt-4 shadow-sm {% if resultado.conflictos > 0 %}border-danger{% else %}border-success{% endif %}">
             <div class="card-header d-flex justify-content-between align-items-center {% if resultado.conflictos > 0 %}bg-danger text-white{% else %}bg-success text-white{% endif %}">

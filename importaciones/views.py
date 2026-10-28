@@ -9,9 +9,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from .services import importar_excel
+from .services import importar_excel, generar_excel_conflictos_json
 
 logger = logging.getLogger(__name__)
+
+# Ruta centralizada para guardar el JSON de conflictos para descargas posteriores
+def obtener_ruta_conflictos_global():
+    return Path(settings.MEDIA_ROOT) / "importaciones" / "conflictos.json"
 
 
 @login_required
@@ -22,36 +26,32 @@ def subir_excel(request):
     """
     Vista encargada de procesar la carga masiva de estudiantes y carpetas
     a través de un archivo Excel (.xlsx).
-    Valida extensión, tamaño, permisos y gestiona archivos temporales de forma segura.
     """
     resultado = None
 
     if request.method == "POST":
         archivo = request.FILES.get("archivo")
 
-        # 1. Validar que se haya enviado un archivo
         if not archivo:
             messages.error(request, "Debes seleccionar un archivo Excel.")
             return render(request, "importaciones/subir_excel.html")
 
-        # 2. Validar la extensión del archivo
         extension = Path(archivo.name).suffix.lower()
         if extension != ".xlsx":
             messages.error(request, "El archivo debe tener formato .xlsx.")
             return render(request, "importaciones/subir_excel.html")
 
-        # 3. Validar el límite de tamaño (máximo 10 MB)
         if archivo.size > 10 * 1024 * 1024:
             messages.error(request, "El archivo no puede superar los 10 MB.")
             return render(request, "importaciones/subir_excel.html")
 
         try:
-            # 4. Uso de directorio temporal seguro para procesar el archivo y conflictos
             with tempfile.TemporaryDirectory() as temporal:
                 ruta_excel = Path(temporal) / "importacion.xlsx"
-                ruta_conflictos = Path(temporal) / "conflictos.json"
+                
+                # Usar la ruta global en media para que esté disponible en las descargas
+                ruta_conflictos = obtener_ruta_conflictos_global()
 
-                # Guardar chunks del archivo subido en disco temporal
                 with ruta_excel.open("wb") as destino:
                     for fragmento in archivo.chunks():
                         destino.write(fragmento)
@@ -59,7 +59,6 @@ def subir_excel(request):
                 # Ejecutar el servicio de importación
                 resultado = importar_excel(ruta_excel, ruta_conflictos)
 
-            # 5. Evaluar resultados y emitir mensajes al usuario
             if any(c.get("tipo") == "error_importacion" for c in resultado.get("detalle_conflictos", [])):
                 messages.error(
                     request,
@@ -94,13 +93,10 @@ def subir_excel(request):
 @login_required
 @permission_required("estudiantes.add_estudiante", raise_exception=True)
 @permission_required("estudiantes.add_carpeta", raise_exception=True)
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def ver_errores_importacion(request):
-    """
-    Vista opcional orientada a renderizar un historial o detalle de conflictos 
-    globales guardados en la ruta estática o persistente de media.
-    """
-    ruta_conflictos = Path(settings.MEDIA_ROOT) / "importaciones" / "conflictos.json"
+    """Renderiza el listado de conflictos guardados en el JSON global."""
+    ruta_conflictos = obtener_ruta_conflictos_global()
     
     conflictos = []
     if ruta_conflictos.exists():
@@ -114,6 +110,8 @@ def ver_errores_importacion(request):
     return render(request, "importaciones/errores_importacion.html", {
         "conflictos": conflictos
     })
+
+
 @login_required
 @permission_required("estudiantes.add_estudiante", raise_exception=True)
 def descargar_plantilla_excel(request):
@@ -122,7 +120,6 @@ def descargar_plantilla_excel(request):
     ws = wb.active
     ws.title = "Plantilla Estudiantes"
 
-    # Encabezados exactos que reconoce tu función 'leer_excel'
     encabezados = [
         "Número de Carpeta", "Programa", "Nombre del Estudiante", 
         "Tipo de Documento (CC, TI)", "Cédula o Identificación", "Teléfono", "Correo Electrónico", 
@@ -132,7 +129,6 @@ def descargar_plantilla_excel(request):
     ]
     ws.append(encabezados)
 
-    # Opcional: Agregar una fila de ejemplo para guiar al usuario
     ejemplo = [
         "1012345678", "Ingeniería de Sistemas", "Juan Pérez Gómez", 
         "CC", "1012345678", "3001234567", "juan.perez@example.com", 
@@ -140,7 +136,6 @@ def descargar_plantilla_excel(request):
     ]
     ws.append(ejemplo)
 
-    # Configurar la respuesta HTTP como archivo Excel descargable
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
@@ -152,40 +147,13 @@ def descargar_plantilla_excel(request):
 @login_required
 @permission_required("estudiantes.add_estudiante", raise_exception=True)
 def descargar_errores_excel(request):
-    """Lee el archivo de conflictos guardado y genera un Excel con los errores."""
-    ruta_conflictos = Path(settings.MEDIA_ROOT) / "importaciones" / "conflictos.json"
-    conflictos = []
+    """
+    Utiliza la función estilizada de services.py para retornar 
+    el Excel formateado profesionalmente con los errores de importación.
+    """
+    ruta_conflictos = obtener_ruta_conflictos_global()
     
-    if ruta_conflictos.exists():
-        try:
-            with open(ruta_conflictos, "r", encoding="utf-8") as archivo:
-                conflictos = json.load(archivo)
-        except Exception:
-            conflictos = []
-
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Errores de Importación"
-
-    # Encabezados del reporte de errores
-    ws.append(["Fila Excel", "Tipo de Conflicto", "Descripción / Mensaje de Error"])
-
-    for item in conflictos:
-        fila = item.get("fila_excel", "General")
-        tipo = item.get("tipo", "Desconocido")
-        
-        # Unir múltiples mensajes si existen, o tomar el mensaje directo
-        mensajes = item.get("mensajes")
-        if mensajes:
-            detalle = " | ".join(mensajes)
-        else:
-            detalle = item.get("mensaje", "")
-
-        ws.append([fila, tipo, detalle])
-
-    response = HttpResponse(
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    response["Content-Disposition"] = 'attachment; filename="reporte_errores_importacion.xlsx"'
-    wb.save(response)
-    return response
+    try:
+        return generar_excel_conflictos_json(ruta_conflictos)
+    except FileNotFoundError:
+        return render(request, "errores.html", {"mensaje": "No hay reportes de conflictos disponibles para descargar."})
