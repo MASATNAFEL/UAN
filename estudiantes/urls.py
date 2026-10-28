@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     # Página principal
     path("", views.index, name="index"),
+    path("car/", views.index1, name="index1"),
     # Consulta de información
     path("info/<str:cedula_ciudadania>/", views.informacion, name="informacion"),
     path("car/<int:codcarpeta>/", views.infocarpeta, name="infocarpeta"),

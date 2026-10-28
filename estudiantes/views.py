@@ -15,6 +15,14 @@ def index(request):
     lista_Estudiantes = Estudiante.objects.filter(activo=True).order_by("nombre")
     context = {"lista_Estudiantes":lista_Estudiantes}
     return render(request,"estudiantes/index.html",context)
+
+@login_required
+@permission_required('carpetas.view_estudiante', raise_exception=True)
+@permission_required('carpetas.view_carpeta', raise_exception=True)
+def index1(request):
+    lista_Carpetas = Carpeta.objects.filter(activo=True).order_by("nombre")
+    context = {"lista_Estudiantes":lista_Carpetas}
+    return render(request,"estudiantes/index.html",context)
 @login_required
 @permission_required('estudiantes.view_estudiante', raise_exception=True)
 def informacion(request,cedula_ciudadania):

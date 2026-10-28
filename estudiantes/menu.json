@@ -5,6 +5,11 @@
         "icono": "bi-people"
     },
     {
+        "nombre": "Informacion Carpetas",
+        "url": "index1",
+        "icono": "bi-people"
+    },
+    {
         "nombre": "Estudiantes",
         "icono": "bi-mortarboard",
         "submenu": [

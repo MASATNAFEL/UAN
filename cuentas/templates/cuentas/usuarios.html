@@ -1,4 +1,3 @@
-
 {% extends "estudiantes/home.html" %}
 {% load static %}
 
@@ -7,9 +6,7 @@
 {% block content %}
 <div class="container-fluid py-4">
 
-    <div class="d-flex flex-wrap justify-content-between
-                align-items-center gap-3 mb-4">
-
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
             <h2 class="mb-1">
                 <i class="bi bi-people me-2"></i>
@@ -20,22 +17,17 @@
             </p>
         </div>
 
-        <a href="{% url 'crear_usuario' %}"
-           class="btn btn-primary">
+        <a href="{% url 'crear_usuario' %}" class="btn btn-primary">
             <i class="bi bi-person-plus me-1"></i>
             Nuevo usuario
         </a>
-
     </div>
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags|default:'info' }}
-                        alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
                 {{ message }}
-                <button type="button" class="btn-close"
-                        data-bs-dismiss="alert"
-                        aria-label="Cerrar"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
         {% endfor %}
     {% endif %}
@@ -52,52 +44,14 @@
                             <th>Nombre completo</th>
                             <th>Correo electrónico</th>
                             <th>Grupos</th>
-                            <th>Estado</th>
-                            <th class="text-end">Acciones</th>
+                            <th>Estado actual</th>
+                            <th class="text-center">Editar</th> <!-- Nueva columna para el botón editar -->
+                            <th class="text-end">Cambiar estado</th> <!-- Columna para activar/desactivar -->
                         </tr>
                     </thead>
 
                     <tbody>
                         {% for usuario in usuarios %}
-                        
-<td class="text-end">
-    {% if not usuario.is_superuser %}
-
-        <a href="{% url 'editar_usuario' usuario.id %}"
-           class="btn btn-sm btn-outline-primary"
-           title="Editar usuario">
-            <i class="bi bi-pencil-square"></i>
-            Editar
-        </a>
-
-        <form method="post"
-              action="{% url 'cambiar_estado_usuario' usuario.id %}"
-              class="d-inline"
-              onsubmit="return confirm('¿Deseas cambiar el estado de este usuario?');">
-            {% csrf_token %}
-
-            {% if usuario.is_active %}
-                <button type="submit"
-                        class="btn btn-sm btn-outline-danger">
-                    <i class="bi bi-person-slash"></i>
-                    Desactivar
-                </button>
-            {% else %}
-                <button type="submit"
-                        class="btn btn-sm btn-outline-success">
-                    <i class="bi bi-person-check"></i>
-                    Activar
-                </button>
-            {% endif %}
-        </form>
-
-    {% else %}
-        <span class="text-muted small">
-            Cuenta protegida
-        </span>
-    {% endif %}
-</td>
-
                             <tr>
                                 <td class="fw-semibold">
                                     {{ usuario.username }}
@@ -140,11 +94,54 @@
                                         </span>
                                     {% endif %}
                                 </td>
+
+                                <!-- Columna 1: Botón Editar -->
+                                <td class="text-center">
+                                    {% if not usuario.is_superuser %}
+                                        <a href="{% url 'editar_usuario' usuario.id %}"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Editar usuario">
+                                            <i class="bi bi-pencil-square"></i>
+                                            Editar
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted small">—</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Columna 2: Botón Cambiar Estado -->
+                                <td class="text-end">
+                                    {% if not usuario.is_superuser %}
+                                        <form method="post"
+                                              action="{% url 'cambiar_estado_usuario' usuario.id %}"
+                                              class="d-inline"
+                                              onsubmit="return confirm('¿Deseas cambiar el estado de este usuario?');">
+                                            {% csrf_token %}
+
+                                            {% if usuario.is_active %}
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-person-slash"></i>
+                                                    Inactivo
+                                                </button>
+                                            {% else %}
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-person-check"></i>
+                                                    Activar
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted small">
+                                            Cuenta protegida
+                                        </span>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="6"
-                                    class="text-center text-muted py-4">
+                                <td colspan="7" class="text-center text-muted py-4">
                                     No hay usuarios registrados.
                                 </td>
                             </tr>
